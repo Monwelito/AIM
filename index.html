@@ -1,0 +1,1390 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SuperIntelligence Hub — One source of truth</title>
+<meta name="description" content="SuperIntelligence Hub: search validated business rules, exceptions, FAQs and SOPs in one place. Prototype with sample content.">
+<meta name="color-scheme" content="light dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='7' fill='%234F5BFF'/%3E%3Cpath d='M12 6.5v11M6.5 12h11' stroke='white' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+/* ============================================================
+   Design tokens
+   ============================================================ */
+:root{
+  --bg:#F3F5FB; --surface:#FFFFFF; --surface-2:#F8FAFF; --surface-3:#EEF1F9;
+  --ink:#0B1026; --ink-2:#2C3450; --muted:#6C7592; --line:#E6EAF4; --line-2:#D3DAEB;
+
+  --brand:#4F5BFF; --brand-2:#8B5CF6; --brand-3:#FF8A3D; --brand-soft:#EEF0FF; --brand-ink:#3B45D6;
+
+  --ok:#0E9F6E; --ok-soft:#E2F7EF;
+  --warn:#B4690E; --warn-soft:#FDF1DE;
+  --bad:#E5484D; --bad-soft:#FDEBEB;
+
+  --rail-a:#111737; --rail-b:#090D22; --rail-ink:#A7B0D4; --rail-dim:#6C77A8;
+  --node:#E4E9FF; --nodeline:#8E99FF;
+
+  --shadow-xs:0 1px 2px rgba(11,16,38,.05);
+  --shadow-sm:0 1px 2px rgba(11,16,38,.05),0 8px 20px -14px rgba(20,30,80,.35);
+  --shadow:0 2px 4px rgba(11,16,38,.04),0 18px 40px -26px rgba(20,30,80,.5);
+  --shadow-lg:0 40px 90px -40px rgba(11,16,38,.55);
+
+  --r-xs:8px; --r-sm:12px; --r:16px; --r-lg:20px; --r-xl:26px;
+
+  --font-d:'Plus Jakarta Sans','Segoe UI',system-ui,sans-serif;
+  --font-b:'Inter','Segoe UI',system-ui,-apple-system,sans-serif;
+}
+[data-theme=dark]{
+  --bg:#070A18; --surface:#0F1428; --surface-2:#131A33; --surface-3:#1A2140;
+  --ink:#E9EEFF; --ink-2:#C3CBE6; --muted:#8D97BA; --line:#202847; --line-2:#2E3760;
+
+  --brand:#7C86FF; --brand-2:#A78BFA; --brand-3:#FFA94D; --brand-soft:#1B2150; --brand-ink:#AEB5FF;
+
+  --ok:#3ED9A4; --ok-soft:#0D3A2C;
+  --warn:#FFC266; --warn-soft:#392A0C;
+  --bad:#FF8E84; --bad-soft:#3C1A1B;
+
+  --rail-a:#0C1130; --rail-b:#070A1C; --rail-ink:#A7B0D4; --rail-dim:#6C77A8;
+  --node:#1A2150; --nodeline:#7C86FF;
+
+  --shadow-xs:0 1px 2px rgba(0,0,0,.4);
+  --shadow-sm:0 1px 2px rgba(0,0,0,.35),0 10px 24px -16px rgba(0,0,0,.8);
+  --shadow:0 2px 6px rgba(0,0,0,.35),0 22px 46px -28px rgba(0,0,0,.9);
+  --shadow-lg:0 40px 90px -40px rgba(0,0,0,.9);
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.6 var(--font-b);-webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:var(--brand-ink)}
+img,svg{max-width:100%}
+::selection{background:var(--brand-soft);color:var(--brand-ink)}
+:focus-visible{outline:2px solid var(--brand);outline-offset:3px;border-radius:10px}
+h1,h2,h3,h4{font-family:var(--font-d);margin:0;letter-spacing:-.025em;line-height:1.12;text-wrap:balance}
+p{margin:0}
+hr{border:0;border-top:1px solid var(--line);margin:22px 0}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
+
+.skip{position:absolute;left:-9999px;top:8px;z-index:200;background:var(--ink);color:#fff;padding:10px 16px;border-radius:10px}
+.skip:focus{left:12px}
+
+::-webkit-scrollbar{width:11px;height:11px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:20px;border:3px solid transparent;background-clip:content-box}
+::-webkit-scrollbar-thumb:hover{background:var(--muted);background-clip:content-box}
+
+/* ============================================================
+   Shell
+   ============================================================ */
+.shell{display:grid;grid-template-columns:274px minmax(0,1fr);min-height:100vh}
+
+.rail{
+  position:sticky;top:0;height:100vh;overflow-y:auto;overflow-x:hidden;
+  background:linear-gradient(170deg,var(--rail-a) 0%,var(--rail-b) 100%);
+  color:var(--rail-ink);padding:20px 14px 18px;
+  display:flex;flex-direction:column;gap:4px;z-index:60;
+}
+.rail::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(420px 220px at -10% -5%,rgba(124,92,255,.30),transparent 62%),
+    radial-gradient(360px 240px at 120% 105%,rgba(255,138,61,.16),transparent 60%);
+}
+.rail>*{position:relative;z-index:1}
+.rail::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14);background-clip:content-box}
+
+.brand{display:flex;align-items:center;gap:12px;padding:6px 8px 20px;color:#fff;text-decoration:none}
+.brand .mark{
+  width:42px;height:42px;border-radius:14px;flex:none;display:grid;place-items:center;color:#fff;
+  background:linear-gradient(135deg,var(--brand) 0%,var(--brand-2) 100%);
+  box-shadow:0 10px 24px -10px rgba(124,92,255,.95);
+}
+.brand b{font:800 16.5px/1.1 var(--font-d);display:block;letter-spacing:-.02em}
+.brand small{font-size:11.5px;color:var(--rail-dim);display:block;margin-top:3px;letter-spacing:.02em}
+
+.navgroup{margin-top:16px}
+.navgroup>.glab{font:600 10.5px/1 var(--font-b);letter-spacing:.16em;text-transform:uppercase;color:var(--rail-dim);padding:0 12px 9px;display:block}
+.nav{display:flex;flex-direction:column;gap:3px}
+.nav button{
+  display:flex;align-items:center;gap:11px;width:100%;padding:10px 12px;border:0;border-radius:12px;
+  background:none;color:var(--rail-ink);text-align:left;font-weight:500;font-size:14.5px;
+  transition:background .16s,color .16s,transform .16s;
+}
+.nav button:hover{background:rgba(255,255,255,.07);color:#fff;transform:translateX(2px)}
+.nav button.active{
+  background:linear-gradient(90deg,rgba(124,92,255,.42),rgba(124,92,255,.10));
+  color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.10);
+}
+.nav button.active .ico{color:#B9BEFF}
+.nav button .ico{color:var(--rail-dim);transition:color .16s}
+.nav .count{
+  margin-left:auto;background:linear-gradient(135deg,#FFB020,#FF8A3D);color:#2A1400;
+  font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;box-shadow:0 4px 10px -4px rgba(255,138,61,.8)
+}
+.grow{flex:1;min-height:16px}
+
+.role\boxed{position:relative}
+.rolemenu{
+  position:absolute;left:0;right:0;bottom:calc(100% + 10px);background:var(--surface);color:var(--ink);
+  border:1px solid var(--line);border-radius:18px;padding:7px;box-shadow:var(--shadow-lg);
+  display:none;z-index:30;max-height:60vh;overflow:auto;
+}
+.rolemenu.open{display:block;animation:pop .18s cubic-bezier(.2,.9,.3,1) both}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+.rolemenu button{display:block;width:100%;text-align:left;border:0;background:none;border-radius:12px;padding:9px 11px;transition:background .14s}
+.rolemenu button:hover,.rolemenu button.on{background:var(--surface-2)}
+.rolemenu button.on{box-shadow:inset 3px 0 0 var(--brand)}
+.rolemenu small{color:var(--muted);display:block;font-size:12px;line-height:1.4}
+.rolemenu .grp{font:600 10.5px/1 var(--font-b);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:11px 11px 6px}
+
+.rolebtn{
+  width:100%;display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:16px;
+  border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#fff;text-align:left;
+  transition:background .16s,border-color .16s;
+}
+.rolebtn:hover{background:rgba(255,255,255,.11);border-color:rgba(255,255,255,.26)}
+.rolebtn small{display:block;color:var(--rail-dim);font-size:11.5px}
+.rolebtn .av{
+  width:34px;height:34px;border-radius:11px;flex:none;display:grid;place-items:center;
+  font:700 12px var(--font-d);color:#fff;background:linear-gradient(135deg,#2563EB,#7C3AED)
+}
+.rolebtn .chev{margin-left:auto;opacity:.6}
+.classif{font-size:11px;color:var(--rail-dim);padding:14px 10px 0;letter-spacing:.02em}
+
+.railscrim{display:none}
+
+/* ============================================================
+   Frame / topbar
+   ============================================================ */
+.frame{min-width:0;display:flex;flex-direction:column}
+.topbar{
+  position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:14px;
+  padding:13px clamp(16px,3.4vw,42px);
+  background:color-mix(in srgb,var(--bg) 84%,transparent);
+  backdrop-filter:saturate(1.6) blur(14px);-webkit-backdrop-filter:saturate(1.6) blur(14px);
+  border-bottom:1px solid var(--line);
+}
+.ptitle{display:flex;flex-direction:column;min-width:0}
+.ptitle b{font:700 15.5px/1.2 var(--font-d);letter-spacing:-.01em}
+.ptitle small{color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tools{margin-left:auto;display:flex;gap:8px;align-items:center}
+.iconbtn{
+  height:40px;min-width:40px;padding:0 12px;border-radius:12px;border:1px solid var(--line);
+  background:var(--surface);display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  color:var(--muted);transition:.16s;box-shadow:var(--shadow-xs)
+}
+.iconbtn:hover{color:var(--ink);border-color:var(--line-2);transform:translateY(-1px)}
+.iconbtn kbd{font:500 11.5px var(--font-b);border:1px solid var(--line);border-radius:6px;padding:1px 6px;background:var(--surface-2);color:var(--muted)}
+.burger{display:none}
+.ico{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+main{
+  flex:1;width:100%;max-width:1330px;margin:0 auto;
+  padding:clamp(20px,3vw,36px) clamp(16px,3.4vw,42px) 70px;
+}
+.foot{
+  border-top:1px solid var(--line);padding:20px clamp(16px,3.4vw,42px);
+  color:var(--muted);font-size:12.5px;display:flex;gap:16px;flex-wrap:wrap;
+  justify-content:space-between;align-items:center;
+  max-width:1330px;margin:0 auto;width:100%
+}
+.foot .fmeta{display:flex;flex-direction:column;gap:5px;min-width:0}
+.foot .dlbtn{color:var(--brand-ink);border-color:color-mix(in srgb,var(--brand) 35%,transparent);background:var(--brand-soft);text-decoration:none;flex:none}
+.foot .dlbtn:hover{border-color:var(--brand);background:var(--brand);color:#fff}
+
+#view>*{animation:rise .5s cubic-bezier(.22,.85,.3,1) both}
+#view>*:nth-child(2){animation-delay:.05s}
+#view>*:nth-child(3){animation-delay:.1s}
+#view>*:nth-child(4){animation-delay:.15s}
+#view>*:nth-child(5){animation-delay:.2s}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+/* ============================================================
+   Shared components
+   ============================================================ */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-sm)}
+.panel{padding:22px}
+.panel>h3,.card>h3{font-size:17px;margin-bottom:12px}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;height:42px;padding:0 18px;
+  border-radius:13px;border:1px solid var(--line-2);background:var(--surface);color:var(--ink);
+  font-weight:600;font-size:14.5px;transition:.16s;white-space:nowrap;
+}
+.btn:hover{border-color:var(--brand);color:var(--brand-ink);transform:translateY(-1px);box-shadow:var(--shadow-sm)}
+.btn:active{transform:translateY(0)}
+.btn.primary{
+  background:linear-gradient(135deg,var(--brand) 0%,var(--brand-2) 100%);
+  color:#fff;border-color:transparent;box-shadow:0 12px 26px -14px rgba(79,91,255,.95)
+}
+.btn.primary:hover{color:#fff;filter:brightness(1.06)}
+.btn.accent{
+  background:linear-gradient(135deg,#FFB020,#FF8A3D);color:#2B1500;border-color:transparent;
+  font-weight:700;box-shadow:0 12px 26px -14px rgba(255,138,61,.95)
+}
+.btn.accent:hover{color:#2B1500;filter:brightness(1.05)}
+.btn.sm{height:34px;padding:0 13px;font-size:13.5px;border-radius:10px}
+.btn.ghost{border-color:transparent;background:none;color:var(--muted);box-shadow:none}
+.btn.ghost:hover{background:var(--surface-2);color:var(--ink);transform:none}
+.btn[disabled]{opacity:.5;pointer-events:none}
+
+.badge{
+  display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:4px 11px 4px 9px;
+  border-radius:99px;color:var(--tc);background:color-mix(in srgb,var(--tc) 13%,transparent);white-space:nowrap
+}
+.badge .ico{width:14px;height:14px}
+.pill{
+  display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:3px 10px;
+  border-radius:99px;background:var(--surface-3);color:var(--muted);border:1px solid transparent;white-space:nowrap
+}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--c);display:inline-block;flex:none}
+.muted{color:var(--muted)}
+.empty{color:var(--muted);font-size:14px;padding:6px 0;line-height:1.6}
+.fine{font-size:12.5px;color:var(--muted);margin-top:18px;line-height:1.65;max-width:95ch}
+
+.pagehead{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;margin:6px 0 26px}
+.pagehead h1{font-size:clamp(28px,3.6vw,40px);font-weight:800}
+.pagehead p{color:var(--muted);margin-top:9px;max-width:66ch;font-size:15.5px}
+.pagehead .acts{display:flex;gap:9px;flex-wrap:wrap}
+.chip-sample{
+  white-space:nowrap;font-size:12.5px;font-weight:600;color:var(--brand-ink);
+  background:var(--brand-soft);padding:5px 13px;border-radius:99px;border:1px solid color-mix(in srgb,var(--brand) 22%,transparent)
+}
+.slabel{font:700 17px var(--font-d);margin:30px 0 13px;display:flex;align-items:center;gap:10px}
+.note{background:var(--brand-soft);color:var(--ink-2);border:1px solid color-mix(in srgb,var(--brand) 20%,transparent);border-radius:14px;padding:13px 17px;font-size:14px;margin-bottom:18px;line-height:1.6}
+mark{background:color-mix(in srgb,var(--brand) 22%,transparent);color:inherit;border-radius:4px;padding:0 3px;box-shadow:0 0 0 1px color-mix(in srgb,var(--brand) 30%,transparent)}
+
+/* ============================================================
+   Ask / hero
+   ============================================================ */
+.hero{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);gap:40px;align-items:center;padding:6px 0 34px}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;letter-spacing:.04em;
+  text-transform:uppercase;color:var(--brand-ink);background:var(--brand-soft);
+  padding:6px 13px;border-radius:99px;margin-bottom:18px
+}
+.hero h1{font-size:clamp(34px,4.6vw,58px);font-weight:800;letter-spacing:-.04em;line-height:1.04}
+.grad{background:linear-gradient(100deg,var(--brand) 0%,var(--brand-2) 52%,var(--brand-3) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lede{font-size:17px;color:var(--muted);margin:20px 0 26px;max-width:54ch;line-height:1.65}
+
+.search\boxed{
+  display:flex;align-items:center;gap:10px;background:var(--surface);border:1.5px solid var(--line-2);
+  border-radius:19px;padding:8px 8px 8px 19px;box-shadow:0 22px 46px -32px rgba(20,30,80,.75);transition:.2s
+}
+.searchbox:focus-within{border-color:var(--brand);box-shadow:0 0 0 4px var(--brand-soft),0 22px 46px -28px rgba(79,91,255,.6)}
+.searchbox input{flex:1;min-width:0;border:0;outline:0;background:none;font-size:16.5px;height:48px}
+.searchbox input::placeholder{color:var(--muted)}
+.searchbox .ico{color:var(--muted);width:21px;height:21px}
+.tryrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:17px;font-size:13.5px;color:var(--muted)}
+.chip{
+  border:1px solid var(--line-2);background:var(--surface);border-radius:99px;padding:6px 14px;font-size:13.5px;
+  font-weight:500;transition:.16s
+}
+.chip:hover{border-color:var(--brand);background:var(--brand-soft);color:var(--brand-ink);transform:translateY(-1px)}
+.hero-r{padding:20px 18px 14px;background:
+  radial-gradient(500px 260px at 80% 0%,color-mix(in srgb,var(--brand) 9%,transparent),transparent 65%),var(--surface)}
+.caption{font-size:13px;color:var(--muted);text-align:center;margin-top:8px;min-height:38px;line-height:1.5}
+
+/* hub svg */
+.hubsvg{width:100%;height:auto;display:block}
+.cn rect{fill:var(--node);stroke:var(--nodeline);stroke-width:1.3;transition:.22s}
+.cn text{fill:var(--ink);font:500 13px var(--font-b);text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.cn:hover rect{stroke-width:2.2}
+.cn.lit rect{fill:var(--brand-soft);stroke:var(--brand);stroke-width:2.4}
+.cn.me rect{stroke:var(--brand-2);stroke-width:2.6}
+.cn.pick rect{stroke:var(--brand);stroke-width:2.8;fill:var(--brand-soft)}
+.cn[data-node]{cursor:pointer}
+.hubnode rect{fill:url(#hubgrad)}
+.hubnode text{fill:#fff;font:800 15px var(--font-d);text-anchor:middle}
+.hubnode .sm{font:500 10.5px var(--font-b);fill:rgba(255,255,255,.82)}
+.hubnode.pulse rect{animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{filter:brightness(1.14)}}
+.cl{stroke:var(--line-2);stroke-width:2;fill:none;transition:stroke .22s}
+.cl.flow{stroke:var(--brand-3);stroke-dasharray:7 7;animation:dash .7s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-14}}
+.mod rect{fill:var(--ok-soft);stroke:var(--ok);stroke-width:1}
+.mod text{fill:var(--ink);font:500 12px var(--font-b);text-anchor:middle;dominant-baseline:central}
+
+/* ============================================================
+   Results
+   ============================================================ */
+.sect{margin-top:10px}
+.sect h2{font-size:21px;margin-bottom:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.panel h3{font-size:16.5px;margin-bottom:10px}
+
+.row{
+  display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;border:0;background:none;
+  padding:11px 10px;margin:0 -10px;width:calc(100% + 20px);border-radius:12px;transition:background .14s
+}
+.row:hover{background:var(--surface-2)}
+.row .t{font-weight:600;line-height:1.4}
+.row .s{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:7px;margin-top:4px;flex-wrap:wrap}
+.row .ico{color:var(--muted)}
+
+.featured{overflow:hidden;border-radius:var(--r-xl);box-shadow:var(--shadow);margin-bottom:22px}
+.featured .top{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:13px 26px;
+  background:linear-gradient(90deg,var(--ok-soft) 0%,color-mix(in srgb,var(--ok-soft) 30%,transparent) 100%);
+  color:var(--ok);font-weight:700;font-size:13.5px;border-bottom:1px solid var(--line)
+}
+.featured .top .right{margin-left:auto;font-weight:500;color:var(--muted)}
+.featured .body{padding:26px}
+.featured h2{font-size:clamp(22px,2.4vw,29px);margin:14px 0 12px;font-weight:800}
+.answer{font-size:17.5px;line-height:1.6;max-width:70ch;color:var(--ink-2)}
+.meta{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;color:var(--muted);font-size:13px;margin-top:17px}
+.meta span{display:inline-flex;align-items:center;gap:6px}
+.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:22px;align-items:center}
+.actions .sep{flex:1}
+.fb{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted)}
+.fb button.on{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.rot{transform:rotate(180deg);display:inline-flex}
+
+.listcard{padding:6px 22px}
+.listcard .row{border-bottom:1px solid var(--line);border-radius:0;margin:0;padding:15px 0;width:100%}
+.listcard .row:last-child{border:0}
+.gaprow{display:flex;gap:22px;align-items:center;justify-content:space-between;padding:28px;flex-wrap:wrap;border-radius:var(--r-xl)}
+.gaprow h3{font-size:22px;margin-bottom:7px}
+
+/* ============================================================
+   Tabs / toolbar / library
+   ============================================================ */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:17px}
+.tab{
+  border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:9px 17px;
+  display:inline-flex;gap:8px;align-items:center;font-weight:600;font-size:14px;transition:.16s;box-shadow:var(--shadow-xs)
+}
+.tab:hover{border-color:var(--line-2);transform:translateY(-1px)}
+.tab small{color:var(--muted);font-weight:500;font-variant-numeric:tabular-nums}
+.tab.on{background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;border-color:transparent;box-shadow:0 10px 22px -14px rgba(79,91,255,.9)}
+.tab.on small{color:rgba(255,255,255,.8)}
+
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:20px}
+.field{
+  height:42px;border:1px solid var(--line-2);background:var(--surface);border-radius:13px;padding:0 14px;
+  min-width:0;color:var(--ink);transition:.16s;font-size:14.5px
+}
+.field:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 4px var(--brand-soft)}
+select.field{cursor:pointer;padding-right:34px;appearance:none;
+  background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
+  background-position:calc(100% - 18px) 19px,calc(100% - 13px) 19px;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:17px}
+.ecard{
+  padding:20px;text-align:left;display:flex;flex-direction:column;gap:11px;width:100%;
+  transition:transform .18s,box-shadow .18s,border-color .18s;border-radius:var(--r-lg)
+}
+.ecard:hover{transform:translateY(-4px);border-color:color-mix(in srgb,var(--brand) 45%,var(--line));box-shadow:var(--shadow)}
+.ecard h3{font-size:17.5px;line-height:1.25;font-weight:700}
+.ecard p{color:var(--muted);font-size:14px;line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.ecard .foot{display:flex;gap:8px 14px;flex-wrap:wrap;align-items:center;font-size:12.5px;color:var(--muted);margin-top:auto;padding-top:6px;border-top:1px solid var(--line)}
+.ecard .foot span{display:inline-flex;align-items:center;gap:6px}
+
+.upload-panel{margin:0 0 24px}
+.uploadrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.uploadrow input[type=file]{flex:1;min-width:230px;padding:11px 13px;border:1.5px dashed var(--line-2);border-radius:13px;background:var(--surface-2);font-size:14px}
+.uploadrow input[type=file]::file-selector-button{border:0;background:var(--brand-soft);color:var(--brand-ink);font-weight:600;padding:6px 13px;border-radius:9px;margin-right:12px;cursor:pointer}
+.upload-results{display:grid;gap:9px;margin-top:14px}
+.upload-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:13px;background:var(--surface-2)}
+.upload-item small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+
+/* ============================================================
+   Requests / review cards
+   ============================================================ */
+.qcard{padding:22px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center}
+.qcard+.qcard{margin-top:13px}
+.qcard h3{font-size:18px;margin:9px 0 4px;font-weight:700}
+.qcard .acts{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+
+/* ============================================================
+   Insights
+   ============================================================ */
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:17px;margin-bottom:19px}
+.kpi{padding:20px;position:relative;overflow:hidden}
+.kpi::after{content:"";position:absolute;right:-34px;top:-34px;width:104px;height:104px;border-radius:50%;background:var(--brand-soft);opacity:.75}
+.kpi>*{position:relative;z-index:1}
+.kpi .n{font:800 32px/1 var(--font-d);letter-spacing:-.035em;margin:10px 0 7px;font-variant-numeric:tabular-nums}
+.kpi .l{color:var(--muted);font-size:13.5px;line-height:1.5}
+.kpi .d{font-size:12.5px;margin-top:9px;color:var(--ok);font-weight:600}
+
+.chart{width:100%;height:auto;display:block}
+.chart rect{fill:var(--line-2)}
+.chart rect.hi{fill:url(#bargrad)}
+.chart text{fill:var(--muted);font:12px var(--font-b)}
+.chart .gl{stroke:var(--line);stroke-width:1}
+
+.covrow{display:grid;grid-template-columns:120px 1fr 30px;gap:13px;align-items:center;margin:14px 0;font-size:14px}
+.covbar{display:flex;height:16px;border-radius:99px;overflow:hidden;background:var(--surface-3);gap:2px}
+.covbar i{display:block;background:var(--tc);transition:flex .3s}
+.legend{display:flex;gap:15px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin-top:10px}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+.legend i{width:11px;height:11px;border-radius:4px;background:var(--tc);display:inline-block}
+
+.toplist{list-style:none;margin:0;padding:0}
+.toplist li{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
+.toplist li:last-child{border:0}
+.bar{height:7px;border-radius:9px;background:var(--surface-3);margin-top:7px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,var(--brand),var(--brand-2))}
+
+/* ============================================================
+   Business case
+   ============================================================ */
+.casegrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.9fr);gap:22px}
+.slider{margin:0 0 22px}
+.slider:last-child{margin-bottom:0}
+.slider .top{display:flex;justify-content:space-between;gap:12px;font-weight:600;font-size:14.5px;margin-bottom:9px}
+.slider output{font-family:var(--font-d);font-weight:800;color:var(--brand-ink);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--brand);height:6px;cursor:pointer}
+.result{
+  background:linear-gradient(155deg,#151B44 0%,#0A0E26 100%);color:#fff;border-radius:var(--r-xl);
+  padding:30px;position:sticky;top:88px;align-self:start;overflow:hidden;box-shadow:var(--shadow-lg)
+}
+.result::after{content:"";position:absolute;right:-60px;top:-60px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(124,92,255,.55),transparent 70%)}
+.result>*{position:relative;z-index:1}
+.result .cap{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:#9AA4D6;font-weight:600}
+.result .big{font:800 clamp(38px,5vw,58px)/1 var(--font-d);letter-spacing:-.04em;color:#FFB020;margin:12px 0 5px;font-variant-numeric:tabular-nums}
+.result .sub{color:#A7B0D6;font-size:14px;line-height:1.6}
+.result .mini{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px;padding-top:21px;border-top:1px solid rgba(255,255,255,.14)}
+.result .mini b{display:block;font:700 22px var(--font-d);color:#fff;font-variant-numeric:tabular-nums}
+.result .mini small{color:#9AA4D6;font-size:12.5px;line-height:1.4;display:block;margin-top:3px}
+
+.roadmap{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:15px;margin-top:10px}
+.phase{padding:20px;position:relative;transition:transform .18s,box-shadow .18s}
+.phase:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.phase .wk{font-size:12px;color:var(--brand-ink);background:var(--brand-soft);display:inline-block;padding:3px 11px;border-radius:99px;font-weight:700}
+.phase h3{font-size:16.5px;margin:13px 0 9px}
+.phase ul{margin:0;padding-left:17px;color:var(--muted);font-size:13.5px;display:flex;flex-direction:column;gap:6px;line-height:1.5}
+.targets{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin-top:32px}
+.targets .kpi .n{color:var(--brand-ink)}
+
+/* ============================================================
+   Blueprint
+   ============================================================ */
+.bpgrid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:20px;align-items:start}
+.flowsteps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}
+.flowsteps .card{padding:20px;transition:transform .18s,box-shadow .18s}
+.flowsteps .card:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.flowsteps h3{font-size:16.5px;margin:10px 0 7px}
+.flowsteps p{font-size:14px;color:var(--muted);line-height:1.6}
+.comps{display:flex;flex-wrap:wrap;gap:10px}
+.comps .pill{padding:10px 15px;font-size:14px;color:var(--ink);background:var(--surface-2);border-color:var(--line);font-weight:500}
+table.m{width:100%;border-collapse:collapse;font-size:14px}
+table.m th,table.m td{padding:13px 12px;border-bottom:1px solid var(--line);text-align:center}
+table.m th:first-child,table.m td:first-child{text-align:left;font-weight:600}
+table.m th{font-weight:600;color:var(--muted);font-size:12.5px;letter-spacing:.03em;text-transform:uppercase}
+table.m tbody tr:last-child td{border-bottom:0}
+table.m tbody tr:hover{background:var(--surface-2)}
+table.m td .y{color:var(--ok);font-weight:800;font-size:16px}
+table.m td .n{color:var(--line-2);font-weight:700}
+.tscroll{overflow:auto}
+
+/* ============================================================
+   Drawer / modal / palette / toast
+   ============================================================ */
+.scrim{position:fixed;inset:0;background:rgba(6,10,26,.55);backdrop-filter:blur(3px);z-index:50;opacity:0;pointer-events:none;transition:opacity .22s}
+.scrim.open{opacity:1;pointer-events:auto}
+
+.drawer{
+  position:fixed;top:0;right:0;bottom:0;width:min(600px,100vw);background:var(--surface);z-index:60;
+  transform:translateX(103%);transition:transform .3s cubic-bezier(.2,.85,.2,1);overflow:auto;
+  border-left:1px solid var(--line);box-shadow:var(--shadow-lg)
+}
+.drawer.open{transform:none}
+.drawer .in{padding:24px 30px 46px}
+.drawer h2{font-size:clamp(24px,3vw,32px);margin:15px 0 12px;font-weight:800}
+.dhead{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.callout{
+  background:var(--surface-2);border:1px solid var(--line);border-left:4px solid var(--brand);
+  border-radius:16px;padding:18px 20px;font-size:17px;line-height:1.6;margin:18px 0;color:var(--ink-2)
+}
+.dsec{margin-top:26px}
+.dsec h3{font-size:15.5px;margin-bottom:11px;letter-spacing:-.01em}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px;counter-reset:s}
+.steps li label{display:flex;gap:13px;align-items:flex-start;padding:13px 15px;border:1px solid var(--line);border-radius:14px;cursor:pointer;background:var(--surface);transition:.15s}
+.steps li label:hover{border-color:var(--brand);background:var(--brand-soft)}
+.steps input{margin-top:3px;accent-color:var(--brand);width:17px;height:17px;flex:none}
+.steps input:checked+span{color:var(--muted);text-decoration:line-through}
+ul.bul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;line-height:1.6}
+.notapply{background:var(--warn-soft);border:1px solid color-mix(in srgb,var(--warn) 26%,transparent);border-radius:16px;padding:17px 20px}
+.notapply h3{color:var(--warn);font-size:15px}
+
+.modal{
+  position:fixed;left:50%;top:50%;transform:translate(-50%,-46%);width:min(580px,calc(100vw - 28px));
+  max-height:calc(100vh - 44px);overflow:auto;background:var(--surface);border:1px solid var(--line);
+  border-radius:24px;z-index:70;padding:28px;opacity:0;pointer-events:none;transition:all .22s;
+  box-shadow:var(--shadow-lg)
+}
+.modal.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%)}
+.modal h2{font-size:24px;margin-bottom:7px}
+.form{display:flex;flex-direction:column;gap:15px;margin-top:20px}
+.form label{display:flex;flex-direction:column;gap:7px;font-weight:600;font-size:14px}
+.form label span.h{font-weight:400;color:var(--muted);font-size:12.5px}
+.form input,.form select,.form textarea{
+  border:1px solid var(--line-2);background:var(--surface-2);border-radius:12px;padding:11px 13px;width:100%;
+  transition:.15s;font-size:14.5px
+}
+.form input:focus,.form select:focus,.form textarea:focus{outline:none;border-color:var(--brand);background:var(--surface);box-shadow:0 0 0 4px var(--brand-soft)}
+.form textarea{min-height:88px;resize:vertical;line-height:1.55}
+.form .two{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.form .check{flex-direction:row;align-items:center;gap:10px;font-weight:500}
+.form .check input{width:auto;accent-color:var(--brand)}
+.form .btns{display:flex;justify-content:flex-end;gap:9px;margin-top:5px}
+
+.pal{
+  position:fixed;left:50%;top:13vh;transform:translateX(-50%);width:min(640px,calc(100vw - 24px));
+  background:var(--surface);border:1px solid var(--line);border-radius:22px;z-index:80;
+  box-shadow:var(--shadow-lg);display:none;overflow:hidden
+}
+.pal.open{display:block;animation:pop .2s cubic-bezier(.2,.9,.3,1) both}
+.pal input{width:100%;border:0;outline:0;background:none;padding:20px 22px;font-size:17px;border-bottom:1px solid var(--line)}
+.pal ul{list-style:none;margin:0;padding:8px;max-height:52vh;overflow:auto}
+.pal li button{display:flex;gap:13px;align-items:center;width:100%;text-align:left;border:0;background:none;padding:12px 14px;border-radius:13px;transition:background .12s}
+.pal li button.sel{background:var(--brand-soft);box-shadow:inset 3px 0 0 var(--brand)}
+.pal .hint{padding:11px 18px;font-size:12px;color:var(--muted);border-top:1px solid var(--line);background:var(--surface-2)}
+
+.toast{
+  position:fixed;left:50%;bottom:30px;transform:translate(-50%,26px);background:var(--ink);color:var(--bg);
+  padding:13px 21px;border-radius:14px;z-index:90;opacity:0;pointer-events:none;transition:all .26s;
+  max-width:min(92vw,540px);font-size:14.5px;font-weight:500;box-shadow:var(--shadow-lg);
+  display:flex;align-items:center;gap:10px
+}
+[data-theme=dark] .toast{background:var(--brand);color:#0B1026}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width:1180px){
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .roadmap{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .grid3{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .bpgrid,.casegrid{grid-template-columns:1fr}
+  .result{position:static}
+  .flowsteps{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:960px){
+  .shell{grid-template-columns:1fr}
+  .rail{
+    position:fixed;top:0;bottom:0;left:0;width:284px;height:100dvh;
+    transform:translateX(-104%);transition:transform .3s cubic-bezier(.2,.85,.2,1);box-shadow:var(--shadow-lg)
+  }
+  .rail.open{transform:none}
+  .railscrim{display:block;position:fixed;inset:0;background:rgba(6,10,26,.5);z-index:55;opacity:0;pointer-events:none;transition:opacity .25s}
+  .railscrim.open{opacity:1;pointer-events:auto}
+  .burger{display:inline-flex}
+  .hero{grid-template-columns:1fr;gap:26px}
+  .grid3,.two{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .kpis,.roadmap,.flowsteps{grid-template-columns:1fr}
+  .qcard{grid-template-columns:1fr}
+  .qcard .acts{justify-content:flex-start}
+  .form .two{grid-template-columns:1fr}
+  .ptitle small,.iconbtn kbd,.chip-sample .lg{display:none}
+  .featured .body{padding:20px}
+  .drawer .in{padding:20px 20px 40px}
+  .panel{padding:18px}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#view">Skip to content</a>
+
+<div class="shell">
+  <aside class="rail" id="rail" aria-label="Navigation"></aside>
+  <div class="railscrim" id="railscrim" data-act="nav"></div>
+
+  <div class="frame">
+    <header class="topbar">
+      <button class="iconbtn burger" data-act="nav" aria-label="Open navigation"><svg class="ico" viewBox="0 0 24 24"><use href="#i-menu"/></svg></button>
+      <div class="ptitle"><b id="ptitle">Ask</b><small id="psub">Search approved guidance in your own words</small></div>
+      <div class="tools">
+        <span class="chip-sample" title="Everything here is example content for the proposal prototype"><span class="lg">Prototype with </span>sample content</span>
+        <button class="iconbtn" data-act="palette" aria-label="Open quick search"><svg class="ico" viewBox="0 0 24 24"><use href="#i-search"/></svg><kbd id="kbdhint">Ctrl K</kbd></button>
+        <button class="iconbtn" data-act="theme" aria-label="Toggle dark mode"><svg class="ico" viewBox="0 0 24 24" id="themeico"><use href="#i-moon"/></svg></button>
+        <button class="iconbtn" data-act="reset" aria-label="Reset sample data" title="Reset sample data"><svg class="ico" viewBox="0 0 24 24"><use href="#i-refresh"/></svg></button>
+      </div>
+    </header>
+
+    <main id="view" tabindex="-1"></main>
+
+    <footer class="foot">
+      <div class="fmeta">
+        <span>SuperIntelligence Hub &middot; clickable prototype with sample content</span>
+        <span>Information classification: General &middot; Production security, hosting and storage require a backend implementation.</span>
+      </div>
+      <a class="btn sm dlbtn" href="download.html">Download index.html</a>
+    </footer>
+  </div>
+</div>
+
+<div class="scrim" id="scrim" data-act="closeall"></div>
+<aside class="drawer" id="drawer" aria-label="Entry details" role="dialog" aria-modal="true"></aside>
+<div class="modal" id="modal" role="dialog" aria-modal="true"></div>
+<div class="pal" id="pal" role="dialog" aria-label="Quick search"><input id="palq" placeholder="Search the hub or jump to a page…" autocomplete="off"><ul id="pall"></ul><div class="hint">Arrow keys to move &middot; Enter to open &middot; Esc to close</div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+  <linearGradient id="hubgrad" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" style="stop-color:#4F5BFF"/><stop offset="100%" style="stop-color:#8B5CF6"/>
+  </linearGradient>
+  <linearGradient id="bargrad" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" style="stop-color:#8B5CF6"/><stop offset="100%" style="stop-color:#4F5BFF"/>
+  </linearGradient>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5V21h16"/></symbol>
+  <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5h13L22 12v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+  <symbol id="i-calc" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 12h2M14 12h2M8 16h2M14 16h2"/></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 17v5M9 3h6l-1 6 3 3v2H7v-2l3-3z"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="M7 11v9H3v-9zM7 11l4-8a2 2 0 0 1 2 2v4h6a2 2 0 0 1 2 2l-1 7a2 2 0 0 1-2 2H7"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16M3 12A9 9 0 0 1 18.5 5.8L21 8M21 3v5h-5M3 21v-5h5"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></symbol>
+  <symbol id="i-q" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 1-1 1.7M12 17h.01"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17h.01"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h12M9 12h12M9 18h12M4 6h.01M4 12h.01M4 18h.01"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></symbol>
+  <symbol id="i-hub" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l3 3M16 16l3 3M19 5l-3 3M8 16l-3 3"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6.5 6.5 0 0 1 3.5 5.5"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6.3 6.3l2.8 2.8M14.9 14.9l2.8 2.8M17.7 6.3l-2.8 2.8M9.1 14.9l-2.8 2.8"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m8 10 4 4 4-4"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3 10.5 13.5M21 3l-6.5 18-4-8-8-4z"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+</defs>
+</svg>
+
+<script>
+(function(){
+'use strict';
+/* ============================================================
+   Helpers
+   ============================================================ */
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const icon=(n,s)=>`<svg class="ico" viewBox="0 0 24 24"${s?` style="width:${s}px;height:${s}px"`:''} aria-hidden="true"><use href="#i-${n}"/></svg>`;
+const DAY=864e5,HR=36e5;
+const fmt=n=>Math.round(n).toLocaleString('en-US');
+const ago=d=>d<=0?'today':d===1?'yesterday':d<30?d+' days ago':d<60?'last month':Math.round(d/30)+' months ago';
+
+/* ============================================================
+   Reference data
+   ============================================================ */
+const TYPES={
+  rule:{label:'Business rule',plural:'Business Rules',c:'#4F46E5',icon:'shield',pts:'Conditions'},
+  exception:{label:'Exception',plural:'Exceptions',c:'#D97706',icon:'alert',pts:'How to handle it'},
+  faq:{label:'FAQ',plural:'FAQs',c:'#0E8F9E',icon:'q',pts:'Details'},
+  sop:{label:'SOP',plural:'SOPs',c:'#9333EA',icon:'list',pts:'Steps'}
+};
+const DEPTS={
+  billing:{name:'Billing',color:'#2563EB',sla:4,desc:'Owns refunds, fees, invoices and disputes.'},
+  compliance:{name:'Compliance',color:'#DB2777',sla:8,desc:'Owns verification, privacy, retention and approved sources. Reviews all new content.'},
+  support:{name:'Client Support',color:'#0891B2',sla:4,desc:'Owns escalations, SLAs, portal access and contract questions.'}
+};
+const ROLES=[
+  {id:'cs',name:'Customer Service',kind:'consumer',blurb:'Live calls and chats',sugg:['refund window','verify identity','late fee waiver','invoice dispute'],desc:'Handles live interactions. Gets validated answers in seconds instead of waiting for a callback.'},
+  {id:'research',name:'Research Team',kind:'consumer',blurb:'Analysis and deliverables',sugg:['redact personal data','approved sources','data retention','dataset reuse'],desc:'Builds client deliverables. Checks sources and privacy rules without emailing Compliance.'},
+  {id:'nvo',name:'Non-Voice Ops',kind:'consumer',blurb:'Email, chat and back-office queues',sugg:['email backlog','ticket priority','portal reset','refund timeline'],desc:'Works queues at volume. Uses SOPs and templates to stay inside SLA.'},
+  {id:'billing',name:'Billing',kind:'dept',blurb:'Contributes and maintains',sugg:['refund window','late fee waiver','invoice dispute','chargeback'],desc:DEPTS.billing.desc},
+  {id:'compliance',name:'Compliance',kind:'dept',blurb:'Contributes and approves',sugg:['verify identity','data retention','third party','data request'],desc:DEPTS.compliance.desc},
+  {id:'support',name:'Client Support',kind:'dept',blurb:'Contributes and maintains',sugg:['p1 escalation','ticket priority','portal reset','contract amendment'],desc:DEPTS.support.desc}
+];
+const STOP=new Set(['the','a','an','to','how','do','does','i','can','what','is','are','of','for','my','in','on','and','or','we','me','it','when','if','with','be','should','customer','client','about','this','that','there','you','your','after','before','within','need','get']);
+const SYN=[['refund','reimburse','credit','money back','repay'],['verify','verification','identity','authenticate','id check'],['escalate','escalation','p1','urgent','incident','outage'],['invoice','bill','charge','statement'],['fee','penalty','late fee'],['pii','personal data','redact','privacy','sensitive'],['email','mail','inbox'],['delete','erase','retention','dsar','data request'],['dispute','chargeback','contest'],['portal','login','password','access']];
+const PAGES={
+  ask:{t:'Ask',i:'search',s:'Search approved guidance in your own words'},
+  library:{t:'Library',i:'book',s:'Approved knowledge by type and owner'},
+  requests:{t:'Requests',i:'inbox',s:'Questions sent to a department'},
+  review:{t:'Review',i:'check',s:'Approval queue and revalidation'},
+  report:{t:'Report',i:'chart',s:'Search demand, coverage and content gaps'},
+  case:{t:'Business case',i:'calc',s:'Savings model and implementation roadmap'},
+  blueprint:{t:'Blueprint',i:'map',s:'Architecture, information flow and permissions'}
+};
+const GROUPS=[
+  {label:'Workspace',keys:['ask','library','requests','review']},
+  {label:'Insights & planning',keys:['report','case','blueprint']}
+];
+const CONSUMER_PAGES=['ask','requests'];
+const canManage=()=>role().kind==='dept';
+const allowedPage=p=>canManage()||CONSUMER_PAGES.includes(p);
+
+/* ============================================================
+   Seed content
+   ============================================================ */
+function E(id,type,title,answer,dept,days,rev,ver,uses,applies,tags,points,notApply,extra){
+  return Object.assign({id,type,title,answer,dept,days,reviewEvery:rev,version:ver,uses,applies,tags,points:points||[],notApply:notApply||[],status:'validated',up:0,down:0,flags:0},extra||{});
+}
+function seed(){
+  const A=['cs','research','nvo'];
+  const entries=[
+  E('r1','rule','Refund eligibility window','A refund can be approved when the request is raised within 30 days of the invoice date and the service has not been used.','billing',3,90,3,412,['cs','nvo'],['refund','reimburse','money back','credit','30 days','window'],['Request is raised within 30 days of the invoice date','Service or deliverable has not been consumed','Original payment method is still valid','Agents approve up to $200. Above that, a team lead approves'],['Service outage claims. See the outage exception','Invoices already in the dispute process']),
+  E('r2','rule','Late fee waiver authority','Agents can waive one late fee per account in any 12-month period, up to $50. Anything more needs a team lead.','billing',12,90,2,268,['cs','nvo'],['fee','late','penalty','waiver','waive'],['Check the account has no waiver in the last 12 months','Confirm the payment has now been received','Waive in the billing tool and add the case ID to the notes','Above $50, or a second waiver: team lead approval'],['Fees charged by a third-party payment provider']),
+  E('r3','rule','Identity verification before account changes','Verify two identifiers before changing contact details, payment details or access. Never read an identifier back to the customer.','compliance',8,90,4,388,A,['verify','verification','identity','id','security','authenticate'],['Ask for full name plus one of: date of birth, postcode, last four digits of the payment method','Match the answers against the record yourself','Two correct answers means verified. A wrong answer ends the change request','Log the verification in the case notes'],['Accessibility relay callers. See the relay exception','General questions that need no account data']),
+  E('r4','rule','Recording disclosure on calls and chats','Tell every customer at the start that the interaction may be recorded, using the approved script.','compliance',40,180,2,97,['cs'],['recording','consent','disclosure','call','script'],['Use the approved disclosure line at the start of every voice call','The chat banner covers chat, so do not repeat it','If a customer objects, offer the no-recording callback route','Never pause a recording yourself'],[]),
+  E('r5','rule','Retention periods for case records','Case records are kept for 7 years and chat transcripts for 24 months. Do not delete anything early yourself.','compliance',190,180,2,61,A,['retention','delete','records','gdpr','keep','storage'],['Case records: 7 years from closure','Chat transcripts: 24 months','Call recordings: 12 months','Deletion requests go through the data request SOP'],[]),
+  E('r6','rule','Ticket priority levels (P1 to P4)','P1 is a client-wide outage or legal or financial exposure, with a 15-minute response. P2 is 4 hours, P3 is 1 business day, P4 is 3 business days.','support',5,90,3,301,A,['priority','p1','p2','sla','urgent','severity','ticket'],['P1: outage or legal or financial exposure. Respond in 15 minutes','P2: major feature blocked. Respond in 4 hours','P3: single-user issue with a workaround. 1 business day','P4: question or request. 3 business days'],[]),
+  E('r7','rule','Approved sources for research deliverables','Cite only sources on the approved list. Anything else needs a Compliance check before it appears in a client deliverable.','compliance',20,120,2,144,['research'],['sources','citation','research','licence','approved','dataset','reuse'],['Check the source against the approved list','Record the source and access date in the deliverable','Unlisted source: raise a source request','Paywalled material: check the licence allows client reuse'],[]),
+  E('f1','faq',"A customer doesn't recognise a charge. What do I do?",'Look the charge up in the billing tool first. If it matches a valid invoice, explain it and send a copy. If not, start an invoice dispute.','billing',6,120,2,205,['cs','nvo'],['charge','invoice','unrecognised','dispute','statement'],['Search the charge by amount and date','Match it to an invoice line','If it matches: explain and send the invoice copy','If it does not: follow the invoice dispute SOP'],[]),
+  E('f2','faq','How long does a refund take to reach the customer?','Card refunds take 5 to 7 business days after approval. Bank transfers take up to 10.','billing',15,120,1,332,['cs','nvo'],['refund','timeline','how long','days','arrive','reimburse'],['Day count starts at approval, not at the request','Weekends and bank holidays do not count','If it is late, check the refund reference before escalating'],[]),
+  E('f3','faq','Can I share account details with an authorised third party?','Only when an active authorisation is on file and the third party passes the same verification as the account holder.','compliance',22,120,2,118,['cs','nvo'],['third party','authorisation','proxy','privacy','representative'],['Check the authorisation record is active','Verify the third party with two identifiers','Share only what the authorisation covers','Note the authorisation reference in the case'],[]),
+  E('f4','faq','How does a customer reset portal access?','Send the self-service reset link from the portal login page. If the email address no longer exists, follow the portal reset SOP.','support',9,120,2,189,['cs','nvo'],['portal','password','reset','login','access'],['Point the customer to the login page link','Link expires after 30 minutes','Repeated failures: follow the portal reset SOP'],[]),
+  E('f5','faq','Which team owns contract amendment questions?','Client Support owns contract amendments. Raise a request with the contract number and the change wanted, and do not promise dates.','support',33,120,1,52,['cs','nvo'],['contract','amendment','change','terms'],['Collect the contract number','Write down the change the customer wants','Raise a request to Client Support','Tell the customer they will hear back, without a date'],[]),
+  E('f6','faq','Can client emails be forwarded outside the company?','No. Client emails stay inside approved systems. Share a link to the case instead, or ask Compliance for an exception.','compliance',27,180,1,76,A,['email','forward','external','confidential','share'],['Use the case link for internal sharing','Never forward to a personal address','Exception requests go to Compliance with a reason'],[]),
+  E('e1','exception','Refund after 30 days because of a service outage','Refunds beyond 30 days are allowed when the customer was affected by a logged outage. Add the outage reference and get Billing lead approval.','billing',4,90,2,143,['cs','nvo'],['refund','outage','exception','late','30 days','reimburse'],['Find the outage reference in the status log','Confirm the account was in the affected region','Add the reference to the refund request','Billing lead approves before you promise anything'],['The customer never used the service in the affected period']),
+  E('e2','exception','Verification for callers using a relay service','Callers using an accessibility relay verify with the relay operator ID plus one account identifier.','compliance',18,180,1,24,['cs'],['accessibility','relay','verify','deaf','hearing','identity'],['Ask for the relay operator ID and note it','Ask for one account identifier','Continue as normal once both match','Do not ask the relay operator to repeat private details'],[]),
+  E('e3','exception','Account holder has died','Do not discuss the account. Take the caller details and route to the Bereavement desk the same day.','compliance',11,180,2,31,['cs','nvo'],['deceased','bereavement','death','estate','died'],['Offer condolences and avoid account details','Collect the caller name, relationship and number','Raise a bereavement referral','Close the case as routed, not resolved'],[]),
+  E('e4','exception','Disputing more than 20 invoices at once','Bulk disputes over 20 invoices go to the dispute desk as a single case. Do not open separate cases.','billing',26,120,1,38,['cs','nvo'],['bulk','dispute','invoices','batch','many'],['Count the disputed invoices','Open one case and attach the list','Route to the dispute desk','Tell the customer one owner will contact them'],[]),
+  E('s1','sop','Handle an invoice dispute end to end','Log, verify, decide and close within 5 business days. The customer gets an update at day 2 and at closure.','billing',7,90,3,276,['cs','nvo'],['invoice','dispute','sop','process','charge','billing'],['Open a dispute case and attach the invoice','Confirm the disputed lines with the customer','Check usage and contract rates in the billing tool','Decide: correct, credit or uphold the invoice','Tell the customer the outcome and the reason','Close the case and record the root cause'],[]),
+  E('s2','sop','Escalate a P1 client issue','Page the on-call lead, open a bridge and send the first client update within 15 minutes.','support',5,90,3,214,A,['p1','escalate','escalation','incident','urgent','outage'],['Confirm it meets P1 criteria','Page the on-call lead from the escalation sheet','Open the incident bridge and add the client contact','Send the first client update within 15 minutes','Update every 30 minutes until resolved','Write the closure summary within one business day'],[]),
+  E('s3','sop','Redact personal data from a research deliverable','Run the PII scan, review every flag by hand, remove direct identifiers and aggregate small groups before release.','compliance',14,90,2,163,['research'],['pii','redact','personal data','privacy','research','anonymise'],['Run the PII scan on the final draft','Review every flagged item by hand','Replace names with role labels and remove contact details','Aggregate groups of fewer than 5 people','Save the redacted version as a separate file','Compliance spot-checks 1 in 10 deliverables'],[]),
+  E('s4','sop','Clear an email backlog by SLA age','Work the queue by time left to SLA, use approved templates and hand P1 and P2 cases to the on-call lead.','support',19,120,2,94,['nvo'],['email','backlog','queue','sla','non-voice','template'],['Sort the queue by time left to SLA','Close anything a template already answers','Batch similar cases and use the approved templates','Hand P1 and P2 items to the on-call lead','Flag any case within 2 hours of breach to the team lead','Post the backlog count at end of shift'],[]),
+  E('s5','sop','Handle a data subject access request','Log the request, verify identity and pass it to the Privacy desk the same day. The legal deadline is 30 days.','compliance',30,120,2,57,A,['dsar','data request','privacy','access request','gdpr','delete'],['Log the request with today\'s date','Verify the requester\'s identity','Send it to the Privacy desk the same day','Tell the requester they will hear within 30 days','Never send any data yourself'],[]),
+  E('s6','sop','Reset portal access when the email address is gone','Verify identity, confirm the new email in writing, update the portal record and send the reset link to the new address.','support',36,120,1,69,['cs','nvo'],['portal','email','reset','access','login'],['Verify identity with two identifiers','Confirm the new email in writing','Update the portal user record','Send the reset link to the new address','Log the change in the case notes'],[]),
+  E('n1','sop','Chargeback handling','Respond to card chargebacks within 7 days with the invoice, usage record and contact log.','billing',0,90,1,0,['cs','nvo'],['chargeback','card','dispute'],['Pull the chargeback notice and due date','Collect the invoice and usage evidence','Add the customer contact log','Submit the response before day 7'],[],{status:'review',submittedBy:'Billing',submittedAt:Date.now()-5*HR}),
+  E('n2','sop','Public social media complaints','Acknowledge in public within one hour, move the conversation to a private channel and never share account details in public.','support',0,90,1,0,['cs','nvo'],['social','complaint','twitter','public'],['Acknowledge in public within 1 hour','Invite the customer to a private channel','Verify identity privately before any account talk','Log the thread link in the case'],[],{status:'review',submittedBy:'Client Support',submittedAt:Date.now()-26*HR}),
+  E('n3','rule','Credit note approval limits','Credit notes up to $100 are approved by agents, up to $1,000 by team leads, and above that by Billing leadership.','billing',0,90,1,0,['cs'],['credit note','approval','limit'],['Agents: up to $100','Team leads: up to $1,000','Billing leadership: above $1,000'],[],{status:'draft',submittedBy:'Billing',submittedAt:Date.now()-50*HR})
+  ];
+  const now=Date.now();
+  return {v:2,role:'cs',theme:null,entries,
+    requests:[
+      {id:'q1',q:'Can a customer split one refund across two cards?',dept:'billing',from:'cs',urgent:false,createdAt:now-2.2*HR,status:'open'},
+      {id:'q2',q:'Is the 2019 survey dataset cleared for client reuse?',dept:'compliance',from:'research',urgent:false,createdAt:now-26*HR,status:'open'},
+      {id:'q3',q:'Which template do we use for out-of-office replies on the shared mailbox?',dept:'support',from:'nvo',urgent:false,createdAt:now-30*HR,status:'answered',answer:'Use the "Shared mailbox OOO" template in the template library. Do not edit the legal footer.',answeredBy:'support',answeredAt:now-27*HR}
+    ],
+    pins:['r1','s2'],votes:{},recent:[],counts:{},gaps:{'split refund across two cards':7,'dataset reuse rights':5,'weekend escalation contact':4},liveSearches:0,done:{}};
+}
+
+/* ============================================================
+   State
+   ============================================================ */
+const KEY='sih-hub-v2';
+let S=load();
+function load(){try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&(o.v===1||o.v===2)&&Array.isArray(o.entries))return o}}catch(e){}return seed()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const role=()=>ROLES.find(r=>r.id===S.role)||ROLES[0];
+const byId=id=>S.entries.find(e=>e.id===id);
+const live=()=>S.entries.filter(e=>e.status==='validated');
+function fresh(e){const left=e.reviewEvery-e.days;return left<0?'overdue':left<=14?'due':'ok'}
+function freshPill(e){const f=fresh(e);return f==='overdue'?'<span class="pill bad">Review overdue</span>':f==='due'?'<span class="pill warn">Review due soon</span>':''}
+function badge(t){const T=TYPES[t];return `<span class="badge" style="--tc:${T.c}">${icon(T.icon,14)}${T.label}</span>`}
+function deptDot(d){return `<span class="dot" style="--c:${DEPTS[d].color}"></span>${DEPTS[d].name}`}
+function applyTheme(){
+  const t=S.theme||(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+  document.documentElement.dataset.theme=t;
+  const u=$('#themeico use');if(u)u.setAttribute('href',t==='dark'?'#i-sun':'#i-moon');
+}
+
+/* ============================================================
+   Search
+   ============================================================ */
+const stem=w=>w.length>4?w.replace(/(ing|ed|es|s)$/,''):w;
+function tokens(q){return q.toLowerCase().split(/[^a-z0-9]+/).filter(w=>w.length>1&&!STOP.has(w))}
+function expand(q){
+  const base=tokens(q),map=new Map();
+  base.forEach(t=>map.set(stem(t),1));
+  const low=q.toLowerCase();
+  SYN.forEach(g=>{
+    const hit=g.some(m=>m.includes(' ')?low.includes(m):base.some(t=>stem(t)===stem(m)));
+    if(hit)g.forEach(m=>{const k=m.includes(' ')?m:stem(m);if(!map.has(k))map.set(k,.5)});
+  });
+  return {base,terms:[...map.entries()]};
+}
+function scoreEntry(e,ex){
+  const title=e.title.toLowerCase(),tags=e.tags.join(' ').toLowerCase(),ans=e.answer.toLowerCase(),body=e.points.concat(e.notApply).join(' ').toLowerCase();
+  let s=0;
+  ex.terms.forEach(([t,w])=>{
+    if(title.includes(t))s+=5*w;
+    if(tags.includes(t))s+=4*w;
+    if(ans.includes(t))s+=2*w;
+    if(body.includes(t))s+=1*w;
+  });
+  const all=ex.base.length&&ex.base.every(b=>{const k=stem(b);return title.includes(k)||tags.includes(k)||ans.includes(k)||body.includes(k)});
+  if(all)s+=3;
+  if(s>0){if(e.applies.includes(S.role))s+=1.5;s+=Math.min(e.uses,500)/500}
+  return s;
+}
+function search(q,pool){
+  const ex=expand(q);if(!ex.terms.length)return [];
+  return (pool||live()).map(e=>({e,s:scoreEntry(e,ex)})).filter(x=>x.s>=2).sort((a,b)=>b.s-a.s);
+}
+function hl(text,q){
+  const ts=tokens(q).map(stem).filter(t=>t.length>=3);
+  if(!ts.length)return esc(text);
+  const re=new RegExp('('+ts.map(t=>t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')','gi');
+  return String(text).split(re).map((p,i)=>i%2?`<mark>${esc(p)}</mark>`:esc(p)).join('');
+}
+function guessDept(q){
+  const l=q.toLowerCase();
+  if(/refund|invoice|fee|charge|bill|credit|payment|card/.test(l))return 'billing';
+  if(/verif|privacy|data|pii|consent|record|source|dataset|legal|retention/.test(l))return 'compliance';
+  return 'support';
+}
+
+/* ============================================================
+   Hub diagram
+   ============================================================ */
+const NODEINFO={
+  cs:'Customer Service gets validated answers during live calls and chats, so no one waits for a callback.',
+  research:'Research Team checks sources, privacy rules and redaction steps without emailing another department.',
+  nvo:'Non-Voice Ops works queues at volume with SOPs and templates that match the latest rules.',
+  billing:DEPTS.billing.desc+' Publishes through Compliance review.',
+  compliance:DEPTS.compliance.desc,
+  support:DEPTS.support.desc+' Publishes through Compliance review.',
+  hub:'The hub is the single source of truth for the account. It receives validated content, keeps it fresh and serves it through one searchable interface.'
+};
+function hubSVG(big){
+  const L=[['cs','Customer Service',60],['research','Research Team',190],['nvo','Non-Voice Ops',320]];
+  const R=[['billing','Billing',60],['compliance','Compliance',190],['support','Client Support',320]];
+  const clickable=big?' data-node="1"':'';
+  const lines=L.map(([k,,y])=>`<path class="cl" id="l-${k}" d="M205,190 C172,190 172,${y} 140,${y}"/>`).join('')+R.map(([k,,y])=>`<path class="cl" id="l-${k}" d="M420,${y} C388,${y} 388,190 355,190"/>`).join('');
+  const node=(k,t,x,y)=>`<g class="cn" id="n-${k}" data-act="${big?'nodeinfo':''}" data-id="${k}"${clickable}><rect x="${x}" y="${y-24}" width="140" height="48" rx="13"/><text x="${x+70}" y="${y}">${esc(t)}</text></g>`;
+  const mods=big?['Business Rules','FAQs','Exceptions','SOPs','Web App Search'].map((m,i)=>`<g class="mod"><rect x="${6+i*112}" y="388" width="104" height="36" rx="10"/><text x="${58+i*112}" y="406">${m}</text></g>`).join(''):'';
+  return `<svg class="hubsvg" viewBox="0 0 560 ${big?440:380}" role="img" aria-label="Customer Service, Research and Non-Voice Ops on the left, Billing, Compliance and Client Support on the right, all connected through the SuperIntelligence hub">${lines}
+  <g class="hubnode" id="n-hub" data-act="${big?'nodeinfo':''}" data-id="hub"${clickable}><rect x="205" y="135" width="150" height="110" rx="24"/><text x="280" y="178">Super</text><text x="280" y="198">Intelligence</text><text class="sm" x="280" y="222">one source of truth</text></g>
+  ${L.map(([k,t,y])=>node(k,t,0,y)).join('')}${R.map(([k,t,y])=>node(k,t,420,y)).join('')}${mods}</svg>`;
+}
+function setFlow(dept){
+  $$('.cn').forEach(n=>n.classList.remove('lit','me'));
+  $$('.cl').forEach(l=>l.classList.remove('flow'));
+  const hub=$('#n-hub');if(hub)hub.classList.remove('pulse');
+  const me=$('#n-'+S.role);if(me)me.classList.add('me');
+  if(dept){
+    const d=$('#n-'+dept);if(d)d.classList.add('lit');
+    const dl=$('#l-'+dept);if(dl)dl.classList.add('flow');
+    if(role().kind==='consumer'){const rl=$('#l-'+S.role);if(rl)rl.classList.add('flow');if(me)me.classList.add('lit')}
+    if(hub)hub.classList.add('pulse');
+  }
+  const cap=$('#flowcap');
+  if(cap)cap.textContent=dept?`${DEPTS[dept].name} validated this. It reached ${role().kind==='consumer'?'you':'the frontline'} through the hub.`:'Departments validate. The hub serves. Frontline teams get the answer.';
+}
+
+/* ============================================================
+   Layout
+   ============================================================ */
+let page='ask';
+function renderRail(){
+  const pend=S.entries.filter(e=>e.status==='review').length;
+  const r=role();
+  if(!allowedPage(page))page='ask';
+  const groups=GROUPS.map(g=>({label:g.label,keys:g.keys.filter(allowedPage)})).filter(g=>g.keys.length);
+  $('#rail').innerHTML=`
+    <a class="brand" href="#/ask" data-act="go" data-id="ask">
+      <span class="mark">${icon('hub',22)}</span>
+      <span><b>SuperIntelligence Hub</b><small>Proposed platform</small></span>
+    </a>
+    ${groups.map(g=>`<div class="navgroup"><span class="glab">${g.label}</span><nav class="nav" aria-label="${g.label}">
+      ${g.keys.map(k=>{const p=PAGES[k];return `<button data-act="go" data-id="${k}" class="${page===k?'active':''}" ${page===k?'aria-current="page"':''}>${icon(p.i)}<span>${p.t}</span>${k==='review'&&pend?`<span class="count">${pend}</span>`:''}</button>`}).join('')}
+    </nav></div>`).join('')}
+    <div class="grow"></div>
+    <div class="rolebox">
+      <div class="rolemenu" id="rolemenu">${roleMenu()}</div>
+      <button class="rolebtn" data-act="rolemenu" aria-haspopup="true" aria-expanded="false">
+        <span class="av">${r.name.split(' ').map(w=>w[0]).slice(0,2).join('')}</span>
+        <span><b style="font-weight:600;display:block">${esc(r.name)}</b><small>Viewing as &middot; tap to switch</small></span>
+        ${icon('chevron',16)}
+      </button>
+    </div>
+    <div class="classif">Information classification: General</div>`;
+}
+function roleMenu(){
+  const g=(t,k)=>`<div class="grp">${t}</div>`+ROLES.filter(r=>r.kind===k).map(r=>`<button data-act="role" data-id="${r.id}" class="${S.role===r.id?'on':''}">${esc(r.name)}<small>${esc(r.blurb)}</small></button>`).join('');
+  return g('Frontline teams','consumer')+g('Contributing departments','dept');
+}
+function render(){
+  if(!allowedPage(page))page='ask';
+  renderRail();
+  const p=PAGES[page];
+  $('#ptitle').textContent=p.t;
+  $('#psub').textContent=p.s;
+  const v=$('#view');v.innerHTML='';
+  ({ask:renderAsk,library:renderLibrary,requests:renderRequests,review:renderReview,report:renderInsights,case:renderCase,blueprint:renderBlueprint}[page]||renderAsk)();
+}
+function go(p){
+  if(!PAGES[p]||!allowedPage(p)){toast('This area is restricted for '+role().name);p='ask'}
+  page=p;
+  try{history.replaceState(null,'','#/'+p)}catch(e){}
+  closeAll();closeNav();render();window.scrollTo({top:0,behavior:'smooth'});
+}
+function openNav(){$('#rail').classList.add('open');$('#railscrim').classList.add('open')}
+function closeNav(){$('#rail').classList.remove('open');$('#railscrim').classList.remove('open')}
+
+/* ============================================================
+   Ask
+   ============================================================ */
+let curQ='',logT=null,lastLogged='';
+function renderAsk(){
+  const r=role();
+  $('#view').innerHTML=`<section class="hero">
+    <div>
+      <span class="eyebrow">${icon('spark',14)} One searchable source of truth</span>
+      <h1>${canManage()?'Own the knowledge. <span class="grad">Improve the answer.</span>':r.id==='cs'?'Resolve customer questions <span class="grad">with confidence.</span>':r.id==='research'?'Deliver research with <span class="grad">approved guidance.</span>':'Work the queue with <span class="grad">clear, approved steps.</span>'}</h1>
+      <p class="lede">${canManage()?'Upload or create knowledge, review its status, and improve coverage. Only approved content is available to frontline users.':'Search approved business rules, exceptions, FAQs and SOPs. If guidance is missing or unclear, submit a request to the owning department. Your access is limited to Ask and Requests.'}</p>
+      <form class="searchbox" id="sform" role="search">${icon('search')}<input id="q" type="search" placeholder="Ask in your own words, like &ldquo;can I refund after 30 days?&rdquo;" autocomplete="off" aria-label="Search the hub" value="${esc(curQ)}"><button class="btn primary" type="submit">Search</button></form>
+      <div class="tryrow"><span>Common for ${esc(r.name)}:</span>${r.sugg.map(s=>`<button class="chip" type="button" data-act="sugg" data-q="${esc(s)}">${esc(s)}</button>`).join('')}</div>
+    </div>
+    <div class="card hero-r">${hubSVG(false)}<p class="caption" id="flowcap"></p></div>
+  </section><div id="results" aria-live="polite"></div>`;
+  const inp=$('#q');
+  inp.addEventListener('input',()=>{curQ=inp.value;showResults();clearTimeout(logT);logT=setTimeout(()=>logSearch(curQ),1100)});
+  $('#sform').addEventListener('submit',ev=>{ev.preventDefault();curQ=inp.value;showResults();logSearch(curQ,true)});
+  showResults();
+}
+function logSearch(q,force){
+  const n=q.trim().toLowerCase();
+  if(n.length<3||(n===lastLogged&&!force))return;
+  lastLogged=n;
+  const res=search(q);
+  S.liveSearches++;S.counts[n]=(S.counts[n]||0)+1;
+  if(!res.length)S.gaps[n]=(S.gaps[n]||0)+1;
+  save();
+}
+function showResults(){
+  const box=$('#results');if(!box)return;
+  const q=curQ.trim();
+  if(!q){setFlow(null);box.innerHTML=homePanels();return}
+  const res=search(q);
+  if(!res.length){
+    setFlow(null);
+    const d=guessDept(q);
+    box.innerHTML=`<div class="card gaprow"><div><h3>No validated answer yet</h3><p class="muted" style="max-width:58ch;margin-top:6px">Nothing in the hub matches &ldquo;${esc(q)}&rdquo;. Ask ${DEPTS[d].name}. They usually reply within ${DEPTS[d].sla} hours, and the answer is added to the hub for the next person.</p></div>
+    <button class="btn accent" data-act="newRequest" data-q="${esc(q)}" data-dept="${d}">${icon('send',16)}Ask ${DEPTS[d].name}</button></div>`;
+    return;
+  }
+  const top=res[0].e,rest=res.slice(1,7);
+  setFlow(top.dept);
+  box.innerHTML=`<article class="card featured">
+    <div class="top">${icon('shield',18)}Validated answer<span class="right">Best match for ${esc(role().name)}</span></div>
+    <div class="body">${badge(top.type)}<h2>${hl(top.title,q)}</h2><p class="answer">${hl(top.answer,q)}</p>
+      <div class="meta"><span>${deptDot(top.dept)}</span><span>${icon('clock',15)}Validated ${ago(top.days)}</span><span>Version ${top.version}</span>${freshPill(top)}</div>
+      <div class="actions"><button class="btn primary" data-act="open" data-id="${top.id}">Open full guidance ${icon('arrow',16)}</button>
+        <button class="btn" data-act="copy" data-id="${top.id}">${icon('copy',16)}Copy answer</button>
+        <span class="sep"></span>${feedback(top.id)}</div></div></article>
+    ${rest.length?`<h2 class="slabel" style="margin-top:0">More matches</h2><div class="card listcard">${rest.map(x=>listRow(x.e,q)).join('')}</div>`:''}
+    <p class="fine">Not what you needed? <button class="btn ghost sm" data-act="newRequest" data-q="${esc(q)}" data-dept="${guessDept(q)}">Ask a department</button></p>`;
+}
+function feedback(id){
+  const v=S.votes[id];
+  return `<span class="fb">Did this help? <button class="iconbtn btn sm ${v==='up'?'on':''}" data-act="vote" data-id="${id}" data-v="up" aria-label="Yes, helpful" style="min-width:34px;padding:0 8px;height:34px">${icon('up',15)}</button><button class="iconbtn btn sm ${v==='down'?'on':''}" data-act="vote" data-id="${id}" data-v="down" aria-label="No, not helpful" style="min-width:34px;padding:0 8px;height:34px"><span class="rot">${icon('up',15)}</span></button></span>`;
+}
+function listRow(e,q){
+  return `<button class="row" data-act="open" data-id="${e.id}"><div style="flex:1;min-width:0"><div class="t">${q?hl(e.title,q):esc(e.title)}</div><div class="s">${deptDot(e.dept)}<span>&middot;</span><span>${ago(e.days)}</span></div></div>${badge(e.type)}</button>`;
+}
+function homePanels(){
+  const pop=live().slice().sort((a,b)=>((b.applies.includes(S.role)?1000:0)+b.uses)-((a.applies.includes(S.role)?1000:0)+a.uses)).slice(0,5);
+  const recent=live().slice().sort((a,b)=>a.days-b.days).slice(0,5);
+  const pins=S.pins.map(byId).filter(Boolean);
+  setFlow(null);
+  return `<div class="grid3">
+   <section class="card panel"><h3>${icon('spark',16)} Popular for ${esc(role().name)}</h3>${pop.map(e=>listRow(e)).join('')}</section>
+   <section class="card panel"><h3>${icon('clock',16)} Recently validated</h3>${recent.map(e=>listRow(e)).join('')}</section>
+   <section class="card panel"><h3>${icon('pin',16)} Your pins</h3>${pins.length?pins.map(e=>listRow(e)).join(''):'<p class="empty">Pin an entry from any detail view to keep it here for next time.</p>'}</section></div>`;
+}
+
+/* ============================================================
+   Library
+   ============================================================ */
+const LIB={type:'all',dept:'all',fresh:'all',q:''};
+function renderLibrary(){
+  const L=live();
+  const cnt=t=>t==='all'?L.length:L.filter(e=>e.type===t).length;
+  $('#view').innerHTML=`<div class="pagehead"><div><h1>Library</h1><p>Approved knowledge, organized by type and owner. Department users can add content; frontline users have read-only access.</p></div>
+    <div class="acts"><button class="btn" data-act="exportCsv">${icon('download',16)}Export CSV</button>${canManage()?`<button class="btn primary" data-act="newEntry">${icon('plus',16)}Create entry</button>`:''}</div></div>
+   ${canManage()?`<section class="card panel upload-panel"><div style="margin-bottom:14px"><h3>Upload source documents</h3><p class="muted" style="font-size:14px;margin-top:6px;max-width:80ch">Select PDF, Word, Excel or PowerPoint files. The prototype classifies by filename and suggested content type; production text extraction and secure storage require the web-app backend.</p></div>
+     <div class="uploadrow"><input id="docUpload" type="file" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"><button class="btn accent" data-act="classifyUploads">Classify selected files</button></div>
+     <div id="uploadResults" class="upload-results"></div>
+     <p class="fine">Suggested routing: policy/process/rule &rarr; Business Rules; FAQ/question/answer &rarr; FAQs; SOP/step/workflow &rarr; SOPs; exception/escalation/edge case &rarr; Exceptions. Files remain local to this browser demo and are not uploaded to a server.</p></section>`:''}
+   <div class="tabs" role="tablist">${['all','rule','exception','faq','sop'].map(t=>`<button class="tab ${LIB.type===t?'on':''}" role="tab" aria-selected="${LIB.type===t}" data-act="libtype" data-id="${t}">${t==='all'?'All':TYPES[t].plural}<small>${cnt(t)}</small></button>`).join('')}</div>
+   <div class="toolbar"><input class="field" id="libq" type="search" placeholder="Filter this list" aria-label="Filter this list" value="${esc(LIB.q)}" style="flex:1;min-width:200px">
+     <select class="field" id="libdept" aria-label="Department"><option value="all">All departments</option>${Object.entries(DEPTS).map(([k,d])=>`<option value="${k}" ${LIB.dept===k?'selected':''}>${d.name}</option>`).join('')}</select>
+     <select class="field" id="libfresh" aria-label="Freshness"><option value="all">Any freshness</option><option value="due" ${LIB.fresh==='due'?'selected':''}>Review due or overdue</option></select></div>
+   <div class="cards" id="libgrid"></div>`;
+  $('#libq').addEventListener('input',e=>{LIB.q=e.target.value;libGrid()});
+  $('#libdept').addEventListener('change',e=>{LIB.dept=e.target.value;libGrid()});
+  $('#libfresh').addEventListener('change',e=>{LIB.fresh=e.target.value;libGrid()});
+  libGrid();
+}
+function libGrid(){
+  let list=live();
+  if(LIB.type!=='all')list=list.filter(e=>e.type===LIB.type);
+  if(LIB.dept!=='all')list=list.filter(e=>e.dept===LIB.dept);
+  if(LIB.fresh==='due')list=list.filter(e=>fresh(e)!=='ok');
+  if(LIB.q.trim()){const r=search(LIB.q,list);list=r.map(x=>x.e)}else list=list.slice().sort((a,b)=>a.title.localeCompare(b.title));
+  const g=$('#libgrid');if(!g)return;
+  g.innerHTML=list.length?list.map(e=>`<button class="card ecard" data-act="open" data-id="${e.id}"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center">${badge(e.type)}${S.pins.includes(e.id)?icon('pin',16):''}</div><h3>${esc(e.title)}</h3><p>${esc(e.answer)}</p><div class="foot"><span>${deptDot(e.dept)}</span><span>${ago(e.days)}</span>${freshPill(e)}</div></button>`).join(''):'<p class="empty">Nothing matches those filters. Try fewer filters, or ask a department.</p>';
+}
+function classifyDoc(name){
+  const n=name.toLowerCase();
+  if(/faq|question|answer|q.?a|knowledge/.test(n))return 'faq';
+  if(/exception|escalat|edge.?case|special.?case/.test(n))return 'exception';
+  if(/sop|procedure|workflow|work.?instruction|steps?/.test(n))return 'sop';
+  return 'rule';
+}
+function classifyUploads(){
+  if(!canManage()){toast('Only department users can upload documents');return}
+  const input=$('#docUpload'),out=$('#uploadResults');if(!input||!out)return;
+  const files=Array.from(input.files||[]);if(!files.length){toast('Choose one or more documents first');return}
+  const rows=files.map(f=>{const type=classifyDoc(f.name),ext=(f.name.split('.').pop()||'').toUpperCase();return `<div class="upload-item"><div><b>${esc(f.name)}</b><small>${fmt(f.size/1024)} KB &middot; ${esc(ext)} &middot; Routed to ${esc(TYPES[type].plural)}</small></div><span class="pill warn">Needs extraction &amp; review</span></div>`}).join('');
+  out.innerHTML=`<div class="slabel">Auto-classification preview</div>${rows}<div class="note" style="margin-top:12px">No document content has been extracted or published. In production, the secure backend must extract text, split mixed documents into policy / answer / FAQ / SOP records, assign owner and source metadata, and send every new record to Review before publishing.</div>`;
+  toast(`${files.length} file(s) classified for preview`);
+}
+
+/* ============================================================
+   Drawer
+   ============================================================ */
+function openEntry(id){
+  const e=byId(id);if(!e)return;
+  if(e.status==='validated'){e.uses++;S.recent=[id].concat(S.recent.filter(x=>x!==id)).slice(0,8)}
+  save();
+  const T=TYPES[e.type];
+  const checks=S.done[id]||[];
+  const pts=e.points.length?(e.type==='sop'
+    ?`<ol class="steps">${e.points.map((p,i)=>`<li><label><input type="checkbox" data-step="${id}:${i}" ${checks.includes(i)?'checked':''}><span>${esc(p)}</span></label></li>`).join('')}</ol>`
+    :`<ul class="bul">${e.points.map(p=>`<li>${esc(p)}</li>`).join('')}</ul>`):'';
+  const rel=live().filter(o=>o.id!==id).map(o=>({o,n:o.tags.filter(t=>e.tags.includes(t)).length})).filter(x=>x.n>0).sort((a,b)=>b.n-a.n).slice(0,3).map(x=>x.o);
+  $('#drawer').innerHTML=`<div class="in"><div class="dhead">${badge(e.type)}<button class="iconbtn" data-act="closeall" aria-label="Close">${icon('x')}</button></div>
+   <h2>${esc(e.title)}</h2>
+   <div class="meta" style="margin-top:0"><span>${deptDot(e.dept)}</span>${e.status==='validated'?`<span>${icon('shield',15)}Validated ${ago(e.days)}</span><span>Version ${e.version}</span>${freshPill(e)}`:`<span class="pill warn">${e.status==='review'?'Waiting for Compliance review':'Draft'}</span>`}</div>
+   <div class="callout">${esc(e.answer)}</div>
+   ${pts?`<div class="dsec"><h3>${T.pts}</h3>${pts}</div>`:''}
+   ${e.notApply.length?`<div class="dsec notapply"><h3>Does not apply when</h3><ul class="bul">${e.notApply.map(p=>`<li>${esc(p)}</li>`).join('')}</ul></div>`:''}
+   <div class="actions"><button class="btn" data-act="copy" data-id="${id}">${icon('copy',16)}Copy answer</button><button class="btn" data-act="pin" data-id="${id}">${icon('pin',16)}${S.pins.includes(id)?'Unpin':'Pin'}</button>${e.status==='validated'?`<button class="btn" data-act="flag" data-id="${id}">${icon('flag',16)}Report as outdated</button>`:''}</div>
+   ${e.status==='validated'?`<div class="dsec">${feedback(id)}</div>`:''}
+   ${rel.length?`<div class="dsec"><h3>Related</h3>${rel.map(o=>listRow(o)).join('')}</div>`:''}</div>`;
+  $('#drawer').classList.add('open');$('#scrim').classList.add('open');
+  $('#drawer').scrollTop=0;
+}
+function closeAll(){
+  $('#drawer').classList.remove('open');$('#modal').classList.remove('open');$('#pal').classList.remove('open');$('#scrim').classList.remove('open');
+  const rm=$('#rolemenu');if(rm)rm.classList.remove('open');
+}
+
+/* ============================================================
+   Modals & forms
+   ============================================================ */
+function openModal(html){
+  $('#modal').innerHTML=html;$('#modal').classList.add('open');$('#scrim').classList.add('open');
+  const f=$('#modal input,#modal textarea,#modal select');if(f)setTimeout(()=>f.focus(),70);
+}
+const deptOpts=sel=>Object.entries(DEPTS).map(([k,d])=>`<option value="${k}" ${sel===k?'selected':''}>${d.name}</option>`).join('');
+function entryForm(){
+  const r=role(),dflt=r.kind==='dept'?r.id:'billing';
+  openModal(`<h2>${r.kind==='dept'?'New entry':'Suggest content'}</h2><p class="muted">Every new entry goes to Compliance for review before anyone can search it.</p>
+  <form class="form" data-form="entry">
+   <div class="two"><label>Type<select name="type">${Object.entries(TYPES).map(([k,t])=>`<option value="${k}">${t.label}</option>`).join('')}</select></label><label>Owning department<select name="dept">${deptOpts(dflt)}</select></label></div>
+   <label>Title<input name="title" required maxlength="120" placeholder="Name it the way someone would search for it"></label>
+   <label>Short answer<span class="h">One or two sentences an agent can say out loud</span><textarea name="answer" required maxlength="400"></textarea></label>
+   <label>Steps or conditions<span class="h">One per line</span><textarea name="points"></textarea></label>
+   <label>Does not apply when<span class="h">One per line, optional</span><textarea name="notApply" style="min-height:60px"></textarea></label>
+   <label>Search tags<span class="h">Separate with commas</span><input name="tags" placeholder="refund, credit, late"></label>
+   <div class="btns"><button type="button" class="btn ghost" data-act="closeall">Cancel</button><button class="btn primary" type="submit">Send for review</button></div></form>`);
+}
+function requestForm(q,dept){
+  openModal(`<h2>Ask a department</h2><p class="muted">The answer goes back to you here, and with your OK it becomes a hub entry for everyone.</p>
+  <form class="form" data-form="request"><label>Your question<textarea name="q" required maxlength="300">${esc(q||'')}</textarea></label>
+  <div class="two"><label>Send to<select name="dept">${deptOpts(dept||'billing')}</select></label><label>Urgency<select name="urgent"><option value="0">Normal</option><option value="1">Urgent, customer waiting</option></select></label></div>
+  <div class="btns"><button type="button" class="btn ghost" data-act="closeall">Cancel</button><button class="btn primary" type="submit">Send request</button></div></form>`);
+}
+function answerForm(id){
+  const q=S.requests.find(x=>x.id===id);if(!q)return;
+  openModal(`<h2>Answer request</h2><p class="muted">&ldquo;${esc(q.q)}&rdquo;</p>
+  <form class="form" data-form="answer" data-id="${id}"><label>Your answer<textarea name="a" required maxlength="500"></textarea></label>
+  <label class="check"><input type="checkbox" name="pub" checked> Also send this to Compliance as a new FAQ</label>
+  <div class="btns"><button type="button" class="btn ghost" data-act="closeall">Cancel</button><button class="btn primary" type="submit">Send answer</button></div></form>`);
+}
+document.addEventListener('submit',ev=>{
+  const f=ev.target.closest('[data-form]');if(!f)return;ev.preventDefault();
+  const d=Object.fromEntries(new FormData(f).entries());const k=f.dataset.form;
+  if(k==='entry'){
+    const lines=s=>(s||'').split('\n').map(x=>x.trim()).filter(Boolean);
+    S.entries.push(E('u'+Date.now().toString(36),d.type,d.title.trim(),d.answer.trim(),d.dept,0,90,1,0,['cs','research','nvo'],(d.tags||'').split(',').map(x=>x.trim().toLowerCase()).filter(Boolean).concat(tokens(d.title)),lines(d.points),lines(d.notApply),{status:'review',submittedBy:role().name,submittedAt:Date.now()}));
+    save();closeAll();toast('Sent to Compliance for review');render();
+  }
+  if(k==='request'){
+    S.requests.unshift({id:'q'+Date.now().toString(36),q:d.q.trim(),dept:d.dept,from:S.role,urgent:d.urgent==='1',createdAt:Date.now(),status:'open'});
+    save();closeAll();toast(`Sent to ${DEPTS[d.dept].name}. Due within ${DEPTS[d.dept].sla} hours`);go('requests');
+  }
+  if(k==='answer'){
+    const q=S.requests.find(x=>x.id===f.dataset.id);if(!q)return;
+    q.status='answered';q.answer=d.a.trim();q.answeredBy=q.dept;q.answeredAt=Date.now();
+    if(d.pub){S.entries.push(E('u'+Date.now().toString(36),'faq',q.q.replace(/\?*$/,'?'),q.answer,q.dept,0,120,1,0,['cs','research','nvo'],tokens(q.q),[],[],{status:'review',submittedBy:DEPTS[q.dept].name,submittedAt:Date.now()}))}
+    save();closeAll();toast(d.pub?'Answer sent. FAQ queued for review':'Answer sent');render();
+  }
+});
+
+/* ============================================================
+   Requests
+   ============================================================ */
+let reqTab='open';
+function renderRequests(){
+  const open=S.requests.filter(r=>r.status==='open'),done=S.requests.filter(r=>r.status==='answered');
+  const list=reqTab==='open'?open:done;
+  $('#view').innerHTML=`<div class="pagehead"><div><h1>Requests</h1><p>When the hub has no answer, ask the owning department here. Each request has a response target, and answers can become hub entries.</p></div>
+    <div class="acts"><button class="btn primary" data-act="newRequest" data-q="" data-dept="billing">${icon('plus',16)}Ask a department</button></div></div>
+  <div class="tabs"><button class="tab ${reqTab==='open'?'on':''}" data-act="reqtab" data-id="open">Open<small>${open.length}</small></button><button class="tab ${reqTab==='answered'?'on':''}" data-act="reqtab" data-id="answered">Answered<small>${done.length}</small></button></div>
+  ${list.length?list.map(reqCard).join(''):'<div class="card panel"><p class="empty">Nothing here. When the hub cannot answer a question, send it to a department and it will show up here.</p></div>'}`;
+}
+function reqCard(q){
+  const from=ROLES.find(r=>r.id===q.from),d=DEPTS[q.dept];
+  let status;
+  if(q.status==='open'){const left=q.createdAt+d.sla*HR-Date.now();status=left>0?`<span class="pill ok">${left>HR?Math.round(left/HR)+' h left':Math.max(1,Math.round(left/6e4))+' min left'}</span>`:`<span class="pill bad">${Math.max(1,Math.round(-left/HR))} h overdue</span>`}
+  else{const t=Math.max(1,Math.round((q.answeredAt-q.createdAt)/HR));status=`<span class="pill ok">Answered in ${t} h</span>`}
+  const canAns=q.status==='open'&&(S.role===q.dept||S.role==='compliance');
+  return `<div class="card qcard"><div><div class="meta" style="margin:0 0 5px"><span>${deptDot(q.dept)}</span><span>from ${esc(from?from.name:'')}</span>${q.urgent?'<span class="pill bad">Urgent</span>':''}${status}</div>
+   <h3>${esc(q.q)}</h3>${q.answer?`<div class="callout" style="margin:12px 0 0;font-size:15px">${esc(q.answer)}</div>`:''}</div>
+   <div class="acts">${canAns?`<button class="btn primary sm" data-act="answerReq" data-id="${q.id}">Answer</button>`:''}</div></div>`;
+}
+
+/* ============================================================
+   Review
+   ============================================================ */
+function renderReview(){
+  const pend=S.entries.filter(e=>e.status==='review'),drafts=S.entries.filter(e=>e.status==='draft');
+  const due=live().filter(e=>fresh(e)!=='ok'||e.flags>0).sort((a,b)=>(a.reviewEvery-a.days)-(b.reviewEvery-b.days));
+  const isC=S.role==='compliance';
+  $('#view').innerHTML=`<div class="pagehead"><div><h1>Review</h1><p>Nothing reaches the frontline without a Compliance check, and nothing stays live past its review date.</p></div></div>
+   <div class="note">${isC?'You are viewing as Compliance, so you can approve or send back.':'Only Compliance can approve. Switch role in the sidebar to try the approval step.'}</div>
+   <div class="slabel">Waiting for approval <span class="pill">${pend.length}</span></div>
+   ${pend.length?pend.map(e=>qEntry(e,isC?`<button class="btn primary sm" data-act="approve" data-id="${e.id}">Approve and publish</button><button class="btn sm" data-act="sendBack" data-id="${e.id}">Send back</button>`:'')).join(''):'<div class="card panel"><p class="empty">The queue is clear.</p></div>'}
+   ${drafts.length?`<div class="slabel">Drafts</div>${drafts.map(e=>qEntry(e,(S.role===e.dept||isC)?`<button class="btn sm" data-act="resubmit" data-id="${e.id}">Submit for review</button>`:'')).join('')}`:''}
+   <div class="slabel">Due for revalidation <span class="pill ${due.length?'warn':''}">${due.length}</span></div>
+   ${due.length?due.map(e=>qEntry(e,(S.role===e.dept||isC)?`<button class="btn accent sm" data-act="revalidate" data-id="${e.id}">${icon('check',15)}Still correct</button>`:'',true)).join(''):'<div class="card panel"><p class="empty">Everything in the hub is within its review window.</p></div>'}`;
+}
+function qEntry(e,acts,showFresh){
+  return `<div class="card qcard"><div>${badge(e.type)}<h3>${esc(e.title)}</h3><p class="muted" style="font-size:14px;line-height:1.6">${esc(e.answer)}</p>
+   <div class="meta" style="margin-top:11px"><span>${deptDot(e.dept)}</span>${e.submittedBy?`<span>Submitted by ${esc(e.submittedBy)}</span>`:''}${showFresh?`${freshPill(e)}<span>Last validated ${ago(e.days)}</span>${e.flags?`<span class="pill bad">Reported outdated ${e.flags}x</span>`:''}`:''}</div></div>
+   <div class="acts"><button class="btn sm" data-act="open" data-id="${e.id}">View</button>${acts}</div></div>`;
+}
+
+/* ============================================================
+   Report
+   ============================================================ */
+function bars(vals,labels){
+  const w=520,h=168,m=Math.max.apply(null,vals),bw=w/vals.length;
+  const grid=[0,.5,1].map(f=>`<line class="gl" x1="8" x2="${w-8}" y1="${14+h*(1-f)}" y2="${14+h*(1-f)}"/>`).join('');
+  return `<svg class="chart" viewBox="0 0 ${w} ${h+34}" role="img" aria-label="Searches per week, rising from ${vals[0]} to ${vals[vals.length-1]}">${grid}${vals.map((v,i)=>{const bh=Math.max(5,v/m*h);return `<rect x="${i*bw+9}" y="${h-bh+14}" width="${bw-18}" height="${bh}" rx="8" class="${i===vals.length-1?'hi':''}"/><text x="${i*bw+bw/2}" y="${h-bh+7}" text-anchor="middle">${v}</text><text x="${i*bw+bw/2}" y="${h+30}" text-anchor="middle">${labels[i]}</text>`}).join('')}</svg>`;
+}
+function renderInsights(){
+  const L=live(),overdue=L.filter(e=>fresh(e)==='overdue').length;
+  const weekly=[214,238,260,301,347,389,412,468];weekly[7]+=S.liveSearches;
+  const tops=Object.assign({'refund window':412,'verify identity':388,'p1 escalation':301,'late fee waiver':268,'redact personal data':233},S.counts);
+  const topList=Object.entries(tops).sort((a,b)=>b[1]-a[1]).slice(0,5),tmax=topList[0][1];
+  const gaps=Object.entries(S.gaps).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const cov=Object.entries(DEPTS).map(([k,d])=>({k,d,n:L.filter(e=>e.dept===k)}));
+  $('#view').innerHTML=`<div class="pagehead"><div><h1>Report</h1><p>Operational analysis of search demand, knowledge coverage, unanswered questions, review health and improvement opportunities.</p></div><span class="chip-sample">Search counts are sample data</span></div>
+  <div class="kpis">
+   <div class="card kpi"><div class="l">Validated entries</div><div class="n">${L.length}</div><div class="l">${S.entries.filter(e=>e.status==='review').length} waiting for review</div></div>
+   <div class="card kpi"><div class="l">Target: fewer repetitive inquiries</div><div class="n">40&ndash;60%</div><div class="d">From the proposal</div></div>
+   <div class="card kpi"><div class="l">Target: faster turnaround</div><div class="n">20&ndash;30%</div><div class="d">From the proposal</div></div>
+   <div class="card kpi"><div class="l">Past review date</div><div class="n" style="color:${overdue?'var(--bad)':'var(--ok)'}">${overdue}</div><div class="l">${overdue?'Needs revalidation':'All current'}</div></div></div>
+  <div class="two">
+   <section class="card panel"><h3>Searches per week</h3>${bars(weekly,['W1','W2','W3','W4','W5','W6','W7','Now'])}</section>
+   <section class="card panel"><h3>Coverage by department</h3>${cov.map(c=>{const t=['rule','exception','faq','sop'].map(x=>({x,n:c.n.filter(e=>e.type===x).length}));return `<div class="covrow"><span>${deptDot(c.k)}</span><div class="covbar">${t.map(z=>z.n?`<i style="--tc:${TYPES[z.x].c};flex:${z.n}" title="${TYPES[z.x].plural}: ${z.n}"></i>`:'').join('')}</div><b>${c.n.length}</b></div>`}).join('')}
+    <div class="legend">${Object.values(TYPES).map(t=>`<span><i style="--tc:${t.c}"></i>${t.plural}</span>`).join('')}</div></section>
+   <section class="card panel"><h3>Top searches</h3><ul class="toplist">${topList.map(([q,n])=>`<li><div style="flex:1"><div>${esc(q)}</div><div class="bar"><i style="width:${n/tmax*100}%"></i></div></div><b>${fmt(n)}</b></li>`).join('')}</ul></section>
+   <section class="card panel"><h3>Questions the hub could not answer</h3><p class="muted" style="font-size:14px;margin-bottom:8px">Each one is a content gap. Turn the biggest into new entries.</p><ul class="toplist">${gaps.map(([q,n])=>`<li><div>${esc(q)}<div class="muted" style="font-size:12.5px">Searched ${n} times</div></div><button class="btn sm" data-act="newRequest" data-q="${esc(q)}" data-dept="${guessDept(q)}">Ask ${DEPTS[guessDept(q)].name}</button></li>`).join('')||'<li class="empty">No gaps logged yet.</li>'}</ul></section>
+  </div>`;
+}
+
+/* ============================================================
+   Business case
+   ============================================================ */
+const CASE={staff:120,esc:6,min:14,pct:50,cost:22,days:21,resp:8};
+function renderCase(){
+  const sl=(k,l,min,max,step,suf)=>`<div class="slider"><div class="top"><label for="c-${k}">${l}</label><output id="o-${k}">${CASE[k]}${suf||''}</output></div><input type="range" id="c-${k}" min="${min}" max="${max}" step="${step}" value="${CASE[k]}" data-case="${k}" data-suf="${suf||''}"></div>`;
+  $('#view').innerHTML=`<div class="pagehead"><div><h1>Business case</h1><p>Move the sliders to match the account. The numbers update as you go.</p></div><span class="chip-sample">Example inputs, replace with account data</span></div>
+  <div class="casegrid"><section class="card panel">
+    ${sl('staff','Frontline staff who use the hub',10,600,10)}${sl('esc','Questions escalated per person, per day',1,20,1)}${sl('min','Minutes lost waiting for each answer',2,60,1)}${sl('resp','Minutes a department spends on each answer',2,40,1)}${sl('pct','Share the hub answers without escalation',10,90,5,'%')}${sl('cost','Loaded cost per hour ($)',8,80,1)}${sl('days','Working days per month',15,26,1)}
+   </section>
+   <section class="result" aria-live="polite"><div class="cap">Hours returned to the business each month</div><div class="big" id="r-hours">0</div><div class="sub">Time that frontline and department staff no longer spend waiting or answering.</div>
+    <div class="mini"><div><small>Monthly value</small><b id="r-month">$0</b></div><div><small>Yearly value</small><b id="r-year">$0</b></div><div><small>Escalations avoided each month</small><b id="r-esc">0</b></div><div><small>Department hours freed</small><b id="r-dept">0</b></div></div></section></div>
+  <div class="slabel" style="margin-top:36px">Implementation roadmap</div>
+  <div class="roadmap">
+   ${[['Phase 1','Content discovery',['Find the questions that repeat most in email and chat','List the rules, exceptions and SOPs behind them','Name a content owner in each department']],['Phase 2','Build the web application and knowledge store',['Set up a secured knowledge store for rules, exceptions, FAQs and SOPs','Add web-app search, tags, permissions and review dates','Define the approval flow']],['Phase 3','Department content migration',['Billing, Compliance and Client Support move content in','Compliance validates each entry','Retire the old email answers']],['Phase 4','Web app build &amp; pilot',['Build the responsive browser-based search experience','Connect secured knowledge store, sign-in and permissions','Pilot with Customer Service and measure time saved']],['Phase 5','Governance and improvement',['Review content on a schedule','Act on unanswered searches','Report results every month']]].map(p=>`<div class="card phase"><span class="wk">${p[0]}</span><h3>${p[1]}</h3><ul>${p[2].map(x=>`<li>${x}</li>`).join('')}</ul></div>`).join('')}</div>
+  <div class="targets"><div class="card kpi"><div class="l">Proposal target</div><div class="n">40&ndash;60%</div><div class="l">fewer repetitive operational inquiries</div></div><div class="card kpi"><div class="l">Proposal target</div><div class="n">20&ndash;30%</div><div class="l">faster turnaround</div></div><div class="card kpi"><div class="l">Proposal target</div><div class="n">10&ndash;15%</div><div class="l">productivity improvement</div></div></div>
+  <p class="fine">The savings model counts only waiting time and department answering time, using the share of questions the hub answers without escalation. It leaves out consistency, onboarding and quality benefits. Replace the example inputs with the account&rsquo;s own figures.</p>`;
+  calc();
+}
+function calc(){
+  const c=CASE,escMonth=c.staff*c.esc*c.days*c.pct/100;
+  const waitH=escMonth*c.min/60,deptH=escMonth*c.resp/60,tot=waitH+deptH,val=tot*c.cost;
+  const set=(id,v)=>{const el=$('#'+id);if(el)el.textContent=v};
+  set('r-hours',fmt(tot));set('r-month','$'+fmt(val));set('r-year','$'+fmt(val*12));set('r-esc',fmt(escMonth));set('r-dept',fmt(deptH));
+}
+
+/* ============================================================
+   Blueprint
+   ============================================================ */
+function renderBlueprint(){
+  const yes='<span class="y" aria-label="Yes">&#10003;</span>',no='<span class="n" aria-label="No">&ndash;</span>';
+  const rows=[['Customer Service',1,0,0,0],['Research Team',1,0,0,0],['Non-Voice Ops',1,0,0,0],['Billing',1,1,1,0],['Client Support',1,1,1,0],['Compliance',1,1,1,1]];
+  $('#view').innerHTML=`<div class="pagehead"><div><h1>Blueprint</h1><p>How the hub is structured and how information moves through it. Select any block to read what it does.</p></div></div>
+  <div class="bpgrid"><div class="card hero-r" style="padding:20px">${hubSVG(true)}</div>
+   <div class="card panel" id="nodepanel"><h3>Single source of truth</h3><p>${esc(NODEINFO.hub)}</p><p class="muted" style="margin-top:14px;font-size:14px;line-height:1.65">Customer Service, Research and Non-Voice Ops can only Ask and submit Requests. Billing, Compliance and Client Support manage the knowledge lifecycle through Library, Review, Report, Business case and Blueprint. Only authorized reviewers can approve content for frontline use.</p></div></div>
+  <div class="slabel" style="margin-top:34px">Key components</div>
+  <div class="card panel"><div class="comps">${['Department knowledge repository','Business rules library','Exception handling center','Process and SOP repository','FAQ and clarifications database','Web app search','Governance and content ownership'].map(c=>`<div class="pill">${c}</div>`).join('')}</div></div>
+  <div class="slabel" style="margin-top:34px">How information flows</div>
+  <div class="flowsteps">
+   <div class="card"><span class="badge" style="--tc:#2563EB">${icon('plus',14)}Contribute</span><h3>Departments upload or create</h3><p>Billing, Compliance and Client Support upload source files or create rules, exceptions, FAQs and SOPs. The platform classifies content for owner review.</p></div>
+   <div class="card"><span class="badge" style="--tc:#DB2777">${icon('shield',14)}Validate</span><h3>Compliance reviews</h3><p>Every new entry is checked and approved before it can be searched.</p></div>
+   <div class="card"><span class="badge" style="--tc:#0E9F6E">${icon('search',14)}Serve</span><h3>One search for everyone</h3><p>Frontline teams get the validated answer, the steps and the exceptions together.</p></div>
+   <div class="card"><span class="badge" style="--tc:#D97706">${icon('refresh',14)}Improve</span><h3>Feedback closes the loop</h3><p>Unanswered searches and outdated reports tell owners what to write or fix next.</p></div></div>
+  <div class="slabel" style="margin-top:34px">Who can do what</div>
+  <div class="card panel tscroll"><table class="m"><thead><tr><th>Role</th><th>Ask / search</th><th>Upload / add</th><th>Review content</th><th>Approve</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r[0]}</td>${r.slice(1).map(v=>`<td>${v?yes:no}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
+  <p class="fine">Access model: Customer Service, Research and Non-Voice Ops have Ask and Requests only. Billing, Compliance and Client Support have the management workspace. The target experience is a standalone, browser-based web application. Users search one approved knowledge hub; content owners manage rules, exceptions, FAQs and SOPs with review dates and audit history. This clickable prototype uses sample content and local page search only; production security, hosting, and data storage still require implementation.</p>`;
+  setFlow(null);
+}
+
+/* ============================================================
+   Command palette
+   ============================================================ */
+let pal={i:0,items:[]};
+function openPalette(){
+  $('#pal').classList.add('open');$('#scrim').classList.add('open');
+  const i=$('#palq');i.value='';palList('');setTimeout(()=>i.focus(),20);
+}
+function palList(q){
+  const nav=Object.entries(PAGES).filter(([k])=>allowedPage(k)).map(([k,p])=>({t:'Go to '+p.t,i:p.i,run:()=>go(k)}));
+  let items=q.trim()?search(q).slice(0,7).map(x=>({t:x.e.title,sub:TYPES[x.e.type].label,i:TYPES[x.e.type].icon,run:()=>{closeAll();openEntry(x.e.id)}})).concat(nav.filter(n=>n.t.toLowerCase().includes(q.toLowerCase()))):nav;
+  pal={i:0,items};
+  $('#pall').innerHTML=items.length?items.map((it,n)=>`<li><button data-pal="${n}" class="${n===0?'sel':''}">${icon(it.i)}<span style="flex:1">${esc(it.t)}</span>${it.sub?`<span class="muted" style="font-size:12.5px">${it.sub}</span>`:''}</button></li>`).join(''):'<li class="empty" style="padding:16px">Nothing found. Try the Ask page to send it to a department.</li>';
+}
+function palMove(d){
+  if(!pal.items.length)return;
+  pal.i=(pal.i+d+pal.items.length)%pal.items.length;
+  $$('#pall button').forEach((b,n)=>b.classList.toggle('sel',n===pal.i));
+  const s=$('#pall button.sel');if(s)s.scrollIntoView({block:'nearest'});
+}
+$('#palq').addEventListener('input',e=>palList(e.target.value));
+$('#palq').addEventListener('keydown',e=>{
+  if(e.key==='ArrowDown'){e.preventDefault();palMove(1)}
+  else if(e.key==='ArrowUp'){e.preventDefault();palMove(-1)}
+  else if(e.key==='Enter'){e.preventDefault();const it=pal.items[pal.i];if(it){closeAll();it.run()}}
+});
+
+/* ============================================================
+   Toast / copy / export
+   ============================================================ */
+let tt=null;
+function toast(m){const t=$('#toast');t.innerHTML=icon('check',16)+'<span>'+esc(m)+'</span>';t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2900)}
+function copyText(txt){
+  if(navigator.clipboard&&navigator.clipboard.writeText){return navigator.clipboard.writeText(txt).then(()=>true).catch(()=>fallbackCopy(txt))}
+  return Promise.resolve(fallbackCopy(txt));
+}
+function fallbackCopy(txt){try{const t=document.createElement('textarea');t.value=txt;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();const ok=document.execCommand('copy');t.remove();return ok}catch(e){return false}}
+function exportCsv(){
+  const q=s=>'"'+String(s).replace(/"/g,'""')+'"';
+  const rows=[['Type','Title','Answer','Owner','Validated days ago','Version','Review every (days)']].concat(live().map(e=>[TYPES[e.type].label,e.title,e.answer,DEPTS[e.dept].name,e.days,e.version,e.reviewEvery]));
+  const blob=new Blob([rows.map(r=>r.map(q).join(',')).join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='hub-library.csv';document.body.appendChild(a);a.click();a.remove();
+  toast('Library exported');
+}
+
+/* ============================================================
+   Actions
+   ============================================================ */
+const ACT={
+  go:t=>{t.preventDefault&&t.preventDefault();go(t.dataset.id)},
+  open:t=>openEntry(t.dataset.id),
+  closeall:closeAll,
+  nav:()=>{$('#rail').classList.contains('open')?closeNav():openNav()},
+  sugg:t=>{curQ=t.dataset.q;const i=$('#q');if(i){i.value=curQ;i.focus()}showResults();logSearch(curQ,true)},
+  copy:t=>{const e=byId(t.dataset.id);if(!e)return;copyText(e.title+'\n'+e.answer+(e.points.length?'\n- '+e.points.join('\n- '):'')).then(ok=>toast(ok?'Answer copied':'Could not copy. Select the text instead'))},
+  pin:t=>{const id=t.dataset.id,i=S.pins.indexOf(id);if(i>=0)S.pins.splice(i,1);else S.pins.push(id);save();toast(i>=0?'Unpinned':'Pinned to your home');openEntry(id);if(page==='ask'&&!curQ)showResults()},
+  vote:t=>{const id=t.dataset.id,v=t.dataset.v,e=byId(id);if(!e)return;const prev=S.votes[id];if(prev==='up')e.up--;if(prev==='down')e.down--;if(prev===v){delete S.votes[id]}else{S.votes[id]=v;if(v==='up')e.up++;else e.down++}save();toast(S.votes[id]?(v==='up'?'Thanks, noted':'Thanks. We will flag this for review'):'Feedback removed');if(v==='down'&&S.votes[id]){e.flags++;save()}rerenderFeedback(id)},
+  flag:t=>{const e=byId(t.dataset.id);if(!e)return;e.flags++;save();toast(`Reported to ${DEPTS[e.dept].name} for revalidation`);renderRail()},
+  newEntry:()=>{if(!canManage()){toast('Only department users can add content');return}entryForm()},
+  classifyUploads:()=>classifyUploads(),
+  newRequest:t=>requestForm(t.dataset.q,t.dataset.dept),
+  answerReq:t=>answerForm(t.dataset.id),
+  reqtab:t=>{reqTab=t.dataset.id;renderRequests()},
+  libtype:t=>{LIB.type=t.dataset.id;renderLibrary()},
+  approve:t=>{if(S.role!=='compliance'){toast('Only Compliance can approve');return}const e=byId(t.dataset.id);if(!e)return;e.status='validated';e.days=0;save();toast('Published. It is now searchable');render()},
+  sendBack:t=>{if(S.role!=='compliance')return;const e=byId(t.dataset.id);if(!e)return;e.status='draft';save();toast('Sent back to '+DEPTS[e.dept].name);render()},
+  resubmit:t=>{const e=byId(t.dataset.id);if(!e)return;e.status='review';e.submittedAt=Date.now();save();toast('Submitted to Compliance');render()},
+  revalidate:t=>{const e=byId(t.dataset.id);if(!e)return;e.days=0;e.flags=0;e.version++;save();toast('Marked as still correct');render()},
+  theme:()=>{const cur=document.documentElement.dataset.theme;S.theme=cur==='dark'?'light':'dark';save();applyTheme()},
+  rolemenu:()=>{const m=$('#rolemenu');m.classList.toggle('open');$('.rolebtn').setAttribute('aria-expanded',m.classList.contains('open'))},
+  role:t=>{S.role=t.dataset.id;curQ='';if(!allowedPage(page))page='ask';save();toast('Now viewing as '+role().name);closeAll();render()},
+  palette:openPalette,
+  reset:()=>{if(confirm('Reset all sample data, pins and requests?')){S=seed();save();curQ='';applyTheme();toast('Sample data reset');go('ask')}},
+  exportCsv:exportCsv,
+  nodeinfo:t=>{
+    const id=t.dataset.id,r=ROLES.find(x=>x.id===id);
+    $$('.cn').forEach(n=>n.classList.remove('pick'));const g=$('#n-'+id);if(g)g.classList.add('pick');
+    const title=id==='hub'?'Single source of truth':(r?r.name:id);
+    const extra=id==='hub'?'':`<button class="btn sm" style="margin-top:16px" data-act="viewas" data-id="${id}">View the hub as ${esc(title)}</button>`;
+    $('#nodepanel').innerHTML=`<h3>${esc(title)}</h3><p>${esc(NODEINFO[id]||'')}</p>${extra}`;
+  },
+  viewas:t=>{S.role=t.dataset.id;save();toast('Now viewing as '+role().name);go('ask')}
+};
+function rerenderFeedback(id){
+  $$('.fb').forEach(f=>{const b=f.querySelector('[data-id="'+id+'"]');if(b){const tmp=document.createElement('div');tmp.innerHTML=feedback(id);f.replaceWith(tmp.firstElementChild)}});
+}
+
+/* ============================================================
+   Events
+   ============================================================ */
+document.addEventListener('click',ev=>{
+  const p=ev.target.closest('[data-pal]');
+  if(p){const it=pal.items[+p.dataset.pal];if(it){closeAll();it.run()}return}
+  const t=ev.target.closest('[data-act]');
+  if(!t){const rm=$('#rolemenu');if(rm&&!ev.target.closest('.rolebox'))rm.classList.remove('open');return}
+  if(!t.dataset.act)return;
+  const fn=ACT[t.dataset.act];if(fn)fn(t,ev);
+});
+document.addEventListener('change',ev=>{
+  const c=ev.target.closest('[data-step]');
+  if(c){const [id,i]=c.dataset.step.split(':'),n=+i;const a=S.done[id]||(S.done[id]=[]);const k=a.indexOf(n);if(c.checked&&k<0)a.push(n);if(!c.checked&&k>=0)a.splice(k,1);save()}
+});
+document.addEventListener('input',ev=>{
+  const r=ev.target.closest('[data-case]');
+  if(r){CASE[r.dataset.case]=+r.value;const o=$('#o-'+r.dataset.case);if(o)o.textContent=r.value+(r.dataset.suf||'');calc()}
+});
+document.addEventListener('keydown',ev=>{
+  const typing=/^(INPUT|TEXTAREA|SELECT)$/.test((ev.target.tagName||''));
+  if((ev.metaKey||ev.ctrlKey)&&ev.key.toLowerCase()==='k'){ev.preventDefault();openPalette();return}
+  if(ev.key==='Escape'){closeAll();closeNav();return}
+  if(ev.key==='/'&&!typing){ev.preventDefault();if(page!=='ask')go('ask');setTimeout(()=>{const i=$('#q');if(i)i.focus()},40)}
+});
+window.addEventListener('hashchange',()=>{const p=(location.hash||'').replace('#/','');if(PAGES[p]&&p!==page){page=allowedPage(p)?p:'ask';render()}});
+window.addEventListener('resize',()=>{if(window.innerWidth>960)closeNav()});
+
+/* ============================================================
+   Boot
+   ============================================================ */
+if(/Mac|iPhone|iPad/.test(navigator.platform||navigator.userAgent||'')){$('#kbdhint').textContent='\u2318K'}
+applyTheme();
+const h=(location.hash||'').replace('#/','');if(PAGES[h])page=h;
+render();
+window.__sih={search,seed,render,go,S:()=>S};
+})();
+</script>
+</body>
+</html>
